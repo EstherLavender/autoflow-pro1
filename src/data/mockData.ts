@@ -1,9 +1,9 @@
-import { ServiceType, ServiceJob, InventoryItem, Vehicle, LoyaltyAccount, Payment, User } from '@/types';
+import { ServiceType, ServiceJob, InventoryItem, Vehicle, LoyaltyAccount, Payment, User, OffRampTransaction, Invoice, ServiceNotification } from '@/types';
 
 export const mockUsers: User[] = [
-  { id: '1', name: 'John Kamau', email: 'john@x402.com', phone: '+254712345678', role: 'admin', createdAt: new Date() },
+  { id: '1', name: 'John Kamau', email: 'john@x402.com', phone: '+254712345678', role: 'admin', walletAddress: '0x8f3a...7b2e', createdAt: new Date() },
   { id: '2', name: 'Mary Wanjiku', email: 'mary@x402.com', phone: '+254723456789', role: 'operator', createdAt: new Date() },
-  { id: '3', name: 'Peter Ochieng', email: 'peter@gmail.com', phone: '+254734567890', role: 'customer', createdAt: new Date() },
+  { id: '3', name: 'Peter Ochieng', email: 'peter@gmail.com', phone: '+254734567890', role: 'customer', walletAddress: '0x1234...abcd', createdAt: new Date() },
 ];
 
 export const mockServiceTypes: ServiceType[] = [
@@ -22,10 +22,10 @@ export const mockVehicles: Vehicle[] = [
 ];
 
 export const mockJobs: ServiceJob[] = [
-  { id: '1', vehicleId: '1', customerId: '3', operatorId: '2', serviceTypeId: '1', status: 'completed', notes: 'Regular customer', partsUsed: [], totalAmount: 500, createdAt: new Date(Date.now() - 86400000), completedAt: new Date(Date.now() - 82800000) },
-  { id: '2', vehicleId: '2', customerId: '3', operatorId: '2', serviceTypeId: '3', status: 'in_progress', partsUsed: [{ partId: '1', quantity: 1 }], totalAmount: 3500, createdAt: new Date() },
-  { id: '3', vehicleId: '3', customerId: '4', serviceTypeId: '2', status: 'pending', partsUsed: [], totalAmount: 1500, createdAt: new Date() },
-  { id: '4', vehicleId: '1', customerId: '3', operatorId: '2', serviceTypeId: '4', status: 'pending', partsUsed: [], totalAmount: 8000, createdAt: new Date() },
+  { id: '1', vehicleId: '1', customerId: '3', operatorId: '2', serviceTypeId: '1', status: 'completed', stage: 'completed', notes: 'Regular customer', partsUsed: [], totalAmount: 500, createdAt: new Date(Date.now() - 86400000), completedAt: new Date(Date.now() - 82800000), invoiceUrl: '/invoices/INV-001.pdf' },
+  { id: '2', vehicleId: '2', customerId: '3', operatorId: '2', serviceTypeId: '3', status: 'in_progress', stage: 'qc', partsUsed: [{ partId: '1', quantity: 1 }], totalAmount: 3500, createdAt: new Date() },
+  { id: '3', vehicleId: '3', customerId: '4', serviceTypeId: '2', status: 'pending', stage: 'scheduled', partsUsed: [], totalAmount: 1500, createdAt: new Date() },
+  { id: '4', vehicleId: '1', customerId: '3', operatorId: '2', serviceTypeId: '4', status: 'pending', stage: 'in_progress', partsUsed: [], totalAmount: 8000, createdAt: new Date() },
 ];
 
 export const mockInventory: InventoryItem[] = [
@@ -44,7 +44,24 @@ export const mockLoyalty: LoyaltyAccount[] = [
 
 export const mockPayments: Payment[] = [
   { id: '1', jobId: '1', customerId: '3', amount: 500, method: 'mpesa', status: 'completed', reference: 'QKJ78HG5TY', createdAt: new Date(Date.now() - 82800000) },
-  { id: '2', jobId: '2', customerId: '3', amount: 3500, method: 'x402', status: 'pending', createdAt: new Date() },
+  { id: '2', jobId: '2', customerId: '3', amount: 3500, amountUsd: 27.13, method: 'x402', stablecoin: 'usdc', txHash: '0xabc...def', status: 'completed', createdAt: new Date(Date.now() - 3600000) },
+  { id: '3', jobId: '4', customerId: '3', amount: 8000, method: 'x402', status: 'pending', createdAt: new Date() },
+];
+
+export const mockOffRampTransactions: OffRampTransaction[] = [
+  { id: '1', amount: 100, stablecoin: 'usdc', targetCurrency: 'KES', targetAmount: 12900, status: 'completed', rainTxId: 'RAIN-001', createdAt: new Date(Date.now() - 86400000) },
+  { id: '2', amount: 50, stablecoin: 'usdt', targetCurrency: 'KES', targetAmount: 6450, status: 'processing', rainTxId: 'RAIN-002', createdAt: new Date() },
+];
+
+export const mockInvoices: Invoice[] = [
+  { id: '1', jobId: '1', customerId: '3', amount: 500, paymentMethod: 'M-Pesa', items: [{ name: 'Basic Wash', price: 500, quantity: 1 }], url: '/invoices/INV-001.pdf', createdAt: new Date(Date.now() - 82800000) },
+  { id: '2', jobId: '2', customerId: '3', amount: 3500, amountUsd: 27.13, paymentMethod: 'USDC (X402)', items: [{ name: 'Oil Change', price: 3500, quantity: 1 }], url: '/invoices/INV-002.pdf', createdAt: new Date(Date.now() - 3600000) },
+];
+
+export const mockNotifications: ServiceNotification[] = [
+  { id: '1', jobId: '2', customerId: '3', stage: 'in_progress', message: 'Your car service has started!', channel: 'sms', status: 'delivered', createdAt: new Date(Date.now() - 7200000) },
+  { id: '2', jobId: '2', customerId: '3', stage: 'qc', message: 'Your car is now in quality check.', channel: 'sms', status: 'delivered', createdAt: new Date(Date.now() - 3600000) },
+  { id: '3', jobId: '2', customerId: '3', stage: 'qc', message: 'Your car is now in quality check.', channel: 'email', status: 'sent', createdAt: new Date(Date.now() - 3600000) },
 ];
 
 export const mockLoyaltyConfig = {
@@ -52,6 +69,21 @@ export const mockLoyaltyConfig = {
   pointsPerService: 1,
   freeServiceThreshold: 10,
   freeServiceType: 'Basic Wash',
+};
+
+// Exchange rates (mock Chainlink price feed data)
+export const exchangeRates = {
+  usdToKes: 129.00,
+  usdcToUsd: 1.0001,
+  usdtToUsd: 0.9998,
+};
+
+export const convertKesToUsd = (kes: number): number => {
+  return Number((kes / exchangeRates.usdToKes).toFixed(2));
+};
+
+export const convertUsdToKes = (usd: number): number => {
+  return Number((usd * exchangeRates.usdToKes).toFixed(2));
 };
 
 // Stats helpers
@@ -69,5 +101,19 @@ export const getTodayStats = () => {
     carsServiced: completedToday.length,
     pendingServices: pendingJobs.length,
     lowStockAlerts: lowStockItems.length,
+  };
+};
+
+// Wallet stats for admin
+export const getWalletStats = () => {
+  const x402Payments = mockPayments.filter(p => p.method === 'x402' && p.status === 'completed');
+  const totalUsdc = x402Payments.filter(p => p.stablecoin === 'usdc').reduce((sum, p) => sum + (p.amountUsd || 0), 0);
+  const totalUsdt = x402Payments.filter(p => p.stablecoin === 'usdt').reduce((sum, p) => sum + (p.amountUsd || 0), 0);
+  
+  return {
+    totalUsdc,
+    totalUsdt,
+    totalUsd: totalUsdc + totalUsdt,
+    pendingOffRamp: mockOffRampTransactions.filter(t => t.status === 'pending' || t.status === 'processing').reduce((sum, t) => sum + t.amount, 0),
   };
 };
