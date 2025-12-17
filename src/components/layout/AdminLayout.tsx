@@ -12,7 +12,8 @@ import {
   Car,
   LogOut,
   Menu,
-  X
+  X,
+  Landmark
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/context/AuthContext';
@@ -31,6 +32,7 @@ const navItems: NavItem[] = [
   { label: 'Inventory', icon: Package, href: '/admin/inventory' },
   { label: 'Staff', icon: Users, href: '/admin/staff' },
   { label: 'Payments', icon: CreditCard, href: '/admin/payments' },
+  { label: 'Off-Ramp', icon: Landmark, href: '/admin/off-ramp' },
   { label: 'Loyalty', icon: Gift, href: '/admin/loyalty' },
   { label: 'Analytics', icon: BarChart3, href: '/admin/analytics' },
   { label: 'Settings', icon: Settings, href: '/admin/settings' },

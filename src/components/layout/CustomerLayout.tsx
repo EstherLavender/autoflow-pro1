@@ -5,11 +5,11 @@ import {
   LogOut,
   Menu,
   X,
-  History,
   Gift,
   CalendarPlus,
-  CreditCard,
-  Home
+  Home,
+  FileText,
+  Bell
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/context/AuthContext';
@@ -24,10 +24,10 @@ interface NavItem {
 
 const navItems: NavItem[] = [
   { label: 'Home', icon: Home, href: '/customer' },
-  { label: 'My Vehicles', icon: Car, href: '/customer/vehicles' },
-  { label: 'Book Service', icon: CalendarPlus, href: '/customer/book' },
-  { label: 'History', icon: History, href: '/customer/history' },
+  { label: 'Book', icon: CalendarPlus, href: '/customer/book' },
+  { label: 'Invoices', icon: FileText, href: '/customer/invoices' },
   { label: 'Rewards', icon: Gift, href: '/customer/rewards' },
+  { label: 'Alerts', icon: Bell, href: '/customer/notifications' },
 ];
 
 interface CustomerLayoutProps {
