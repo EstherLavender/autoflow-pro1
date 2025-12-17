@@ -1,0 +1,73 @@
+import { ServiceType, ServiceJob, InventoryItem, Vehicle, LoyaltyAccount, Payment, User } from '@/types';
+
+export const mockUsers: User[] = [
+  { id: '1', name: 'John Kamau', email: 'john@x402.com', phone: '+254712345678', role: 'admin', createdAt: new Date() },
+  { id: '2', name: 'Mary Wanjiku', email: 'mary@x402.com', phone: '+254723456789', role: 'operator', createdAt: new Date() },
+  { id: '3', name: 'Peter Ochieng', email: 'peter@gmail.com', phone: '+254734567890', role: 'customer', createdAt: new Date() },
+];
+
+export const mockServiceTypes: ServiceType[] = [
+  { id: '1', name: 'Basic Wash', description: 'Exterior wash and dry', price: 500, duration: 30, category: 'wash', loyaltyPoints: 1 },
+  { id: '2', name: 'Premium Wash', description: 'Full interior and exterior cleaning', price: 1500, duration: 60, category: 'wash', loyaltyPoints: 3 },
+  { id: '3', name: 'Oil Change', description: 'Engine oil and filter replacement', price: 3500, duration: 45, category: 'maintenance', loyaltyPoints: 5 },
+  { id: '4', name: 'Brake Service', description: 'Brake pad inspection and replacement', price: 8000, duration: 120, category: 'repair', loyaltyPoints: 10 },
+  { id: '5', name: 'Tire Rotation', description: 'Rotate and balance all tires', price: 2000, duration: 45, category: 'maintenance', loyaltyPoints: 3 },
+  { id: '6', name: 'Full Service Package', description: 'Wash + Oil change + Tire rotation', price: 5500, duration: 150, category: 'package', loyaltyPoints: 12 },
+];
+
+export const mockVehicles: Vehicle[] = [
+  { id: '1', customerId: '3', make: 'Toyota', model: 'Corolla', year: 2020, licensePlate: 'KDA 123A', color: 'Silver' },
+  { id: '2', customerId: '3', make: 'Honda', model: 'CR-V', year: 2019, licensePlate: 'KCB 456B', color: 'Black' },
+  { id: '3', customerId: '4', make: 'Nissan', model: 'X-Trail', year: 2021, licensePlate: 'KDE 789C', color: 'White' },
+];
+
+export const mockJobs: ServiceJob[] = [
+  { id: '1', vehicleId: '1', customerId: '3', operatorId: '2', serviceTypeId: '1', status: 'completed', notes: 'Regular customer', partsUsed: [], totalAmount: 500, createdAt: new Date(Date.now() - 86400000), completedAt: new Date(Date.now() - 82800000) },
+  { id: '2', vehicleId: '2', customerId: '3', operatorId: '2', serviceTypeId: '3', status: 'in_progress', partsUsed: [{ partId: '1', quantity: 1 }], totalAmount: 3500, createdAt: new Date() },
+  { id: '3', vehicleId: '3', customerId: '4', serviceTypeId: '2', status: 'pending', partsUsed: [], totalAmount: 1500, createdAt: new Date() },
+  { id: '4', vehicleId: '1', customerId: '3', operatorId: '2', serviceTypeId: '4', status: 'pending', partsUsed: [], totalAmount: 8000, createdAt: new Date() },
+];
+
+export const mockInventory: InventoryItem[] = [
+  { id: '1', name: 'Engine Oil 5W-30', description: '4L synthetic oil', quantity: 25, minStockLevel: 10, unitPrice: 2500, category: 'Oils', supplier: 'Shell Kenya' },
+  { id: '2', name: 'Oil Filter', description: 'Universal fit', quantity: 8, minStockLevel: 15, unitPrice: 800, category: 'Filters', supplier: 'AutoParts Ltd' },
+  { id: '3', name: 'Brake Pads (Front)', description: 'Ceramic pads', quantity: 12, minStockLevel: 8, unitPrice: 3500, category: 'Brakes', supplier: 'Brake Masters' },
+  { id: '4', name: 'Air Filter', description: 'Standard replacement', quantity: 5, minStockLevel: 10, unitPrice: 1200, category: 'Filters', supplier: 'AutoParts Ltd' },
+  { id: '5', name: 'Car Shampoo', description: '5L concentrate', quantity: 3, minStockLevel: 5, unitPrice: 1500, category: 'Cleaning', supplier: 'Clean Pro' },
+  { id: '6', name: 'Wax Polish', description: 'Premium carnauba wax', quantity: 7, minStockLevel: 4, unitPrice: 2000, category: 'Cleaning', supplier: 'Clean Pro' },
+];
+
+export const mockLoyalty: LoyaltyAccount[] = [
+  { customerId: '3', points: 28, totalVisits: 7, freeServicesEarned: 0, freeServicesRedeemed: 0 },
+  { customerId: '4', points: 42, totalVisits: 9, freeServicesEarned: 0, freeServicesRedeemed: 0 },
+];
+
+export const mockPayments: Payment[] = [
+  { id: '1', jobId: '1', customerId: '3', amount: 500, method: 'mpesa', status: 'completed', reference: 'QKJ78HG5TY', createdAt: new Date(Date.now() - 82800000) },
+  { id: '2', jobId: '2', customerId: '3', amount: 3500, method: 'x402', status: 'pending', createdAt: new Date() },
+];
+
+export const mockLoyaltyConfig = {
+  enabled: true,
+  pointsPerService: 1,
+  freeServiceThreshold: 10,
+  freeServiceType: 'Basic Wash',
+};
+
+// Stats helpers
+export const getTodayStats = () => {
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  
+  const todayJobs = mockJobs.filter(j => new Date(j.createdAt) >= today);
+  const completedToday = todayJobs.filter(j => j.status === 'completed');
+  const pendingJobs = mockJobs.filter(j => j.status === 'pending');
+  const lowStockItems = mockInventory.filter(i => i.quantity <= i.minStockLevel);
+  
+  return {
+    todayRevenue: completedToday.reduce((sum, j) => sum + j.totalAmount, 0),
+    carsServiced: completedToday.length,
+    pendingServices: pendingJobs.length,
+    lowStockAlerts: lowStockItems.length,
+  };
+};
