@@ -12,10 +12,12 @@ import { toast } from 'sonner';
 type AuthMode = 'login' | 'signup';
 type LoginMethod = 'email' | 'phone';
 
-const roleDescriptions = {
+const roleDescriptions: Record<UserRole, string> = {
   admin: 'Manage your business, staff, and analytics',
   operator: 'Handle daily jobs and service tasks',
   customer: 'Track your vehicles and services',
+  garage_partner: 'Manage your garage location',
+  mobile_provider: 'Provide mobile services',
 };
 
 export default function LoginPage() {
@@ -46,6 +48,8 @@ export default function LoginPage() {
       admin: '/admin',
       operator: '/operator',
       customer: '/customer',
+      garage_partner: '/garage',
+      mobile_provider: '/mobile',
     };
     navigate(routes[selectedRole]);
     setIsLoading(false);
