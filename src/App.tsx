@@ -28,6 +28,9 @@ import BookServicePage from "./pages/customer/BookServicePage";
 import RewardsPage from "./pages/customer/RewardsPage";
 import InvoicesPage from "./pages/customer/InvoicesPage";
 import NotificationsPage from "./pages/customer/NotificationsPage";
+import DiagnosePage from "./pages/customer/DiagnosePage";
+import GaragesPage from "./pages/customer/GaragesPage";
+import WashPage from "./pages/customer/WashPage";
 
 const queryClient = new QueryClient();
 
@@ -146,6 +149,26 @@ function AppRoutes() {
       <Route path="/customer/notifications" element={
         <ProtectedRoute allowedRoles={['customer']}>
           <NotificationsPage />
+        </ProtectedRoute>
+      } />
+      <Route path="/customer/diagnose" element={
+        <ProtectedRoute allowedRoles={['customer']}>
+          <DiagnosePage />
+        </ProtectedRoute>
+      } />
+      <Route path="/customer/garages" element={
+        <ProtectedRoute allowedRoles={['customer']}>
+          <GaragesPage />
+        </ProtectedRoute>
+      } />
+      <Route path="/customer/wash" element={
+        <ProtectedRoute allowedRoles={['customer']}>
+          <WashPage />
+        </ProtectedRoute>
+      } />
+      <Route path="/customer/rescue" element={
+        <ProtectedRoute allowedRoles={['customer']}>
+          <CustomerDashboard />
         </ProtectedRoute>
       } />
       

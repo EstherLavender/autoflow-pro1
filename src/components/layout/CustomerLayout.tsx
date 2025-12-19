@@ -24,10 +24,10 @@ interface NavItem {
 
 const navItems: NavItem[] = [
   { label: 'Home', icon: Home, href: '/customer' },
-  { label: 'Book', icon: CalendarPlus, href: '/customer/book' },
-  { label: 'Invoices', icon: FileText, href: '/customer/invoices' },
+  { label: 'Wash', icon: Car, href: '/customer/wash' },
+  { label: 'Diagnose', icon: Bell, href: '/customer/diagnose' },
+  { label: 'Garages', icon: Gift, href: '/customer/garages' },
   { label: 'Rewards', icon: Gift, href: '/customer/rewards' },
-  { label: 'Alerts', icon: Bell, href: '/customer/notifications' },
 ];
 
 interface CustomerLayoutProps {
