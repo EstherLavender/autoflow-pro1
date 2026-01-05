@@ -10,7 +10,7 @@ import { toast } from 'sonner';
 
 export default function GaragesPage() {
   const navigate = useNavigate();
-  const [filters, setFilters] = useState({ openNow: false, emergencyOnly: false, serviceId: undefined as string | undefined });
+  const [filters, setFilters] = useState<{ openNow: boolean; emergencyOnly: boolean; serviceId?: string }>({ openNow: false, emergencyOnly: false });
   
   const garages = getNearbyGarages(filters);
 

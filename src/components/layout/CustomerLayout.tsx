@@ -1,15 +1,13 @@
 import { ReactNode } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { 
-  Car,
+  Droplets,
   LogOut,
   Menu,
   X,
   Gift,
-  CalendarPlus,
   Home,
-  FileText,
-  Bell
+  MapPin
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/context/AuthContext';
@@ -24,9 +22,8 @@ interface NavItem {
 
 const navItems: NavItem[] = [
   { label: 'Home', icon: Home, href: '/customer' },
-  { label: 'Wash', icon: Car, href: '/customer/wash' },
-  { label: 'Diagnose', icon: Bell, href: '/customer/diagnose' },
-  { label: 'Garages', icon: Gift, href: '/customer/garages' },
+  { label: 'Book Wash', icon: Droplets, href: '/customer/book' },
+  { label: 'Car Washes', icon: MapPin, href: '/customer/garages' },
   { label: 'Rewards', icon: Gift, href: '/customer/rewards' },
 ];
 
@@ -54,22 +51,22 @@ export default function CustomerLayout({ children, title, subtitle }: CustomerLa
         <div className="container flex items-center justify-between py-3">
           <div className="flex items-center gap-2">
             <div className="h-9 w-9 rounded-lg bg-primary flex items-center justify-center">
-              <Car className="h-5 w-5 text-primary-foreground" />
+              <Droplets className="h-5 w-5 text-primary-foreground" />
             </div>
             <div>
-              <span className="font-bold text-sm">X402 CareCare</span>
+              <span className="font-bold text-sm">TRACK WASH</span>
               <p className="text-xs text-muted-foreground">Welcome back!</p>
             </div>
           </div>
 
           <div className="flex items-center gap-2">
-            <Button variant="ghost" size="icon-sm" className="md:hidden" onClick={() => setMenuOpen(!menuOpen)}>
+            <Button variant="ghost" size="icon" className="md:hidden" onClick={() => setMenuOpen(!menuOpen)}>
               {menuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
             </Button>
 
             <div className="hidden md:flex items-center gap-3">
               <span className="text-sm font-medium">{user?.name}</span>
-              <Button variant="ghost" size="icon-sm" onClick={handleLogout}>
+              <Button variant="ghost" size="icon" onClick={handleLogout}>
                 <LogOut className="h-4 w-4" />
               </Button>
             </div>
@@ -154,7 +151,7 @@ export default function CustomerLayout({ children, title, subtitle }: CustomerLa
       {/* Mobile Bottom Navigation */}
       <nav className="md:hidden fixed bottom-0 left-0 right-0 z-50 bg-card border-t border-border">
         <div className="flex items-center justify-around py-2">
-          {navItems.slice(0, 5).map((item) => {
+          {navItems.map((item) => {
             const isActive = location.pathname === item.href;
             return (
               <Link

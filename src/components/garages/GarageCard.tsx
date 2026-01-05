@@ -1,4 +1,4 @@
-import { MapPin, Clock, Star, Phone, AlertCircle, Navigation } from 'lucide-react';
+import { MapPin, Clock, Star, Phone, Navigation } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -24,11 +24,6 @@ export default function GarageCard({ garage, onSelect, onCall }: GarageCardProps
           <div className="flex-1 min-w-0">
             <div className="flex items-center gap-2 mb-1">
               <h3 className="font-semibold truncate">{garage.name}</h3>
-              {garage.emergencyCapable && (
-                <Badge variant="destructive" className="text-[10px] px-1.5 py-0">
-                  24/7
-                </Badge>
-              )}
             </div>
             
             <div className="flex items-center gap-1 text-sm text-muted-foreground mb-2">
@@ -40,11 +35,10 @@ export default function GarageCard({ garage, onSelect, onCall }: GarageCardProps
               <div className="flex items-center gap-1">
                 <Star className="h-3.5 w-3.5 fill-warning text-warning" />
                 <span className="font-medium">{garage.rating}</span>
-                <span className="text-muted-foreground">({garage.reviewCount})</span>
               </div>
               <div className="flex items-center gap-1 text-muted-foreground">
                 <Navigation className="h-3.5 w-3.5" />
-                <span>{garage.distance?.toFixed(1)} km</span>
+                <span>{garage.distance.toFixed(1)} km</span>
               </div>
             </div>
           </div>
@@ -54,7 +48,7 @@ export default function GarageCard({ garage, onSelect, onCall }: GarageCardProps
               {garage.isOpen ? 'Open' : 'Closed'}
             </Badge>
             <p className="text-xs text-muted-foreground mt-1">
-              {garage.operatingHours.open} - {garage.operatingHours.close}
+              {garage.openHours}
             </p>
           </div>
         </div>

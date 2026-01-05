@@ -1,10 +1,9 @@
-import { Star, Clock, MapPin, Phone } from 'lucide-react';
+import { Star, Clock, MapPin } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { MobileProvider } from '@/types';
-import { mockServiceTypes } from '@/data/mockData';
 
 interface MobileProviderCardProps {
   provider: MobileProvider;
@@ -12,11 +11,6 @@ interface MobileProviderCardProps {
 }
 
 export default function MobileProviderCard({ provider, onSelect }: MobileProviderCardProps) {
-  const availableServices = provider.services
-    .map(id => mockServiceTypes.find(s => s.id === id))
-    .filter(Boolean)
-    .slice(0, 3);
-
   return (
     <Card variant="interactive" onClick={() => onSelect(provider)}>
       <CardContent className="p-4">
@@ -49,18 +43,9 @@ export default function MobileProviderCard({ provider, onSelect }: MobileProvide
             </div>
 
             {/* Service Areas */}
-            <div className="flex items-center gap-1 text-xs text-muted-foreground mb-2">
+            <div className="flex items-center gap-1 text-xs text-muted-foreground">
               <MapPin className="h-3 w-3" />
               <span className="truncate">{provider.serviceArea.slice(0, 2).join(', ')}</span>
-            </div>
-
-            {/* Services */}
-            <div className="flex flex-wrap gap-1">
-              {availableServices.map(service => (
-                <Badge key={service!.id} variant="outline" className="text-xs">
-                  {service!.name}
-                </Badge>
-              ))}
             </div>
           </div>
         </div>

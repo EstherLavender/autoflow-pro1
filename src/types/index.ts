@@ -1,4 +1,5 @@
-export type UserRole = 'admin' | 'operator' | 'customer' | 'garage_partner' | 'mobile_provider';
+// User types - simplified for MVP
+export type UserRole = 'admin' | 'operator' | 'customer';
 
 export interface User {
   id: string;
@@ -6,11 +7,10 @@ export interface User {
   email: string;
   phone: string;
   role: UserRole;
-  avatar?: string;
-  walletAddress?: string;
   createdAt: Date;
 }
 
+// Vehicle types
 export interface Vehicle {
   id: string;
   customerId: string;
@@ -19,200 +19,117 @@ export interface Vehicle {
   year: number;
   licensePlate: string;
   color: string;
-  vin?: string;
-  healthStatus?: 'good' | 'attention' | 'urgent';
-  lastServiceDate?: Date;
-  nextServiceDue?: Date;
 }
+
+// Service types
+export type ServiceCategory = 'wash' | 'repair' | 'maintenance' | 'package';
 
 export interface ServiceType {
   id: string;
   name: string;
   description: string;
-  price: number;
-  duration: number;
-  category: 'wash' | 'repair' | 'maintenance' | 'package' | 'detailing';
+  price: number; // in KES
+  duration: number; // in minutes
+  category: ServiceCategory;
   loyaltyPoints: number;
-  mobileAvailable?: boolean;
 }
 
-export type ServiceStage = 'scheduled' | 'in_progress' | 'qc' | 'ready_for_pickup' | 'completed' | 'cancelled';
+// Job types
+export type JobStatus = 'pending' | 'in_progress' | 'completed' | 'cancelled';
 
-export interface ServiceJob {
+export interface Job {
   id: string;
   vehicleId: string;
   customerId: string;
   operatorId?: string;
-  garageId?: string;
-  mobileProviderId?: string;
   serviceTypeId: string;
-  status: 'pending' | 'in_progress' | 'completed' | 'cancelled';
-  stage: ServiceStage;
+  status: JobStatus;
   notes?: string;
-  partsUsed: { partId: string; quantity: number }[];
   totalAmount: number;
   tipAmount?: number;
   createdAt: Date;
   completedAt?: Date;
-  invoiceUrl?: string;
-  location?: { lat: number; lng: number; address: string };
-  isMobile?: boolean;
 }
 
+// Transaction types - M-Pesa only for MVP
+export type PaymentMethod = 'mpesa' | 'cash';
+export type PaymentStatus = 'pending' | 'completed' | 'failed';
+
+export interface Transaction {
+  id: string;
+  jobId: string;
+  amount: number;
+  paymentMethod: PaymentMethod;
+  status: PaymentStatus;
+  reference: string;
+  createdAt: Date;
+}
+
+// Loyalty types - 10th wash free
+export interface LoyaltyAccount {
+  id: string;
+  customerId: string;
+  visits: number; // total washes
+  freeWashesEarned: number;
+  freeWashesRedeemed: number;
+}
+
+// Inventory types
 export interface InventoryItem {
   id: string;
   name: string;
-  description?: string;
   quantity: number;
+  unit: string;
   minStockLevel: number;
-  unitPrice: number;
-  category: string;
-  supplier?: string;
+  costPerUnit: number;
 }
 
-export type StablecoinType = 'usdc' | 'usdt';
-
-export interface Payment {
-  id: string;
-  jobId: string;
-  customerId: string;
-  amount: number;
-  method: 'mpesa' | 'x402' | 'cash' | 'card';
-  stablecoin?: StablecoinType;
-  amountUsd?: number;
-  txHash?: string;
-  status: 'pending' | 'completed' | 'failed';
-  reference?: string;
-  createdAt: Date;
-}
-
-export interface Tip {
-  id: string;
-  jobId: string;
-  recipientId: string;
-  recipientType: 'operator' | 'mobile_provider';
-  amount: number;
-  method: 'mpesa' | 'x402';
-  stablecoin?: StablecoinType;
-  status: 'pending' | 'completed';
-  createdAt: Date;
-}
-
-export interface LoyaltyAccount {
-  customerId: string;
-  points: number;
-  totalVisits: number;
-  freeServicesEarned: number;
-  freeServicesRedeemed: number;
-}
-
-export interface LoyaltyConfig {
-  enabled: boolean;
-  pointsPerService: number;
-  freeServiceThreshold: number;
-  freeServiceType: string;
-}
-
-export interface OffRampTransaction {
-  id: string;
-  amount: number;
-  stablecoin: StablecoinType;
-  targetCurrency: 'KES' | 'USD';
-  targetAmount: number;
-  status: 'pending' | 'processing' | 'completed' | 'failed';
-  rainTxId?: string;
-  createdAt: Date;
-}
-
-export interface Invoice {
-  id: string;
-  jobId: string;
-  customerId: string;
-  amount: number;
-  amountUsd?: number;
-  paymentMethod: string;
-  items: { name: string; price: number; quantity: number }[];
-  url?: string;
-  createdAt: Date;
-}
-
-export interface NotificationPreferences {
-  smsEnabled: boolean;
-  emailEnabled: boolean;
-  phone: string;
-  email: string;
-}
-
-export interface ServiceNotification {
-  id: string;
-  jobId: string;
-  customerId: string;
-  stage: ServiceStage;
-  message: string;
-  channel: 'sms' | 'email';
-  status: 'sent' | 'delivered' | 'failed';
-  createdAt: Date;
-}
-
-// Garage Partner Types
+// Garage/Location types
 export interface Garage {
   id: string;
   name: string;
   address: string;
-  phone: string;
-  email?: string;
-  location: { lat: number; lng: number };
-  operatingHours: { open: string; close: string; days: string[] };
-  services: string[];
+  distance: number; // in km
   rating: number;
-  reviewCount: number;
   isOpen: boolean;
-  emergencyCapable: boolean;
-  images?: string[];
-  distance?: number;
+  openHours: string;
+  services: string[];
+  phone: string;
 }
 
-// Mobile Service Provider Types
+// Tip types
+export interface Tip {
+  id: string;
+  jobId: string;
+  operatorId: string;
+  customerId: string;
+  amount: number; // in KES
+  createdAt: Date;
+}
+
+// Mobile Provider (for mobile detailing)
 export interface MobileProvider {
   id: string;
   name: string;
   phone: string;
-  avatar?: string;
-  serviceArea: string[];
-  services: string[];
   rating: number;
   isAvailable: boolean;
-  currentLocation?: { lat: number; lng: number };
-  eta?: number;
+  eta?: number; // minutes
+  serviceArea: string[];
 }
 
-// AI Diagnostics Types
-export type DiagnosisUrgency = 'low' | 'medium' | 'high' | 'critical';
+// AI Diagnosis (for sound feature)
 export type DiagnosisCategory = 'belt' | 'engine' | 'exhaust' | 'suspension' | 'brakes' | 'transmission' | 'electrical' | 'unknown';
 
 export interface AIDiagnosis {
   id: string;
   vehicleId: string;
   customerId: string;
-  audioUrl?: string;
   description?: string;
   category: DiagnosisCategory;
-  urgency: DiagnosisUrgency;
+  urgency: 'low' | 'medium' | 'high';
   explanation: string;
   recommendation: 'continue_driving' | 'schedule_service' | 'visit_garage' | 'immediate_attention';
   recommendedServices?: string[];
-  createdAt: Date;
-}
-
-// Rescue / Mobile Mechanic Types (Foundation)
-export interface RescueRequest {
-  id: string;
-  customerId: string;
-  vehicleId: string;
-  location: { lat: number; lng: number; address: string };
-  issue: string;
-  status: 'pending' | 'accepted' | 'en_route' | 'arrived' | 'completed' | 'cancelled';
-  assignedMechanicId?: string;
-  eta?: number;
   createdAt: Date;
 }

@@ -8,11 +8,6 @@ import { Label } from '@/components/ui/label';
 import CustomerLayout from '@/components/layout/CustomerLayout';
 import { mockServiceTypes, mockVehicles } from '@/data/mockData';
 import { toast } from 'sonner';
-import { useWallet } from '@/context/WalletContext';
-import { StablecoinType } from '@/types';
-import WalletConnect from '@/components/payments/WalletConnect';
-import StablecoinSelector from '@/components/payments/StablecoinSelector';
-import PaymentConfirmation from '@/components/payments/PaymentConfirmation';
 
 const categoryIcons = {
   wash: Droplets,
@@ -27,12 +22,7 @@ export default function BookServicePage() {
   const [step, setStep] = useState<BookingStep>('vehicle');
   const [selectedVehicle, setSelectedVehicle] = useState<string | null>(null);
   const [selectedService, setSelectedService] = useState<string | null>(null);
-  const [paymentMethod, setPaymentMethod] = useState<'mpesa' | 'x402' | null>(null);
   const [phone, setPhone] = useState('');
-  const [selectedStablecoin, setSelectedStablecoin] = useState<StablecoinType | null>(null);
-  const [showPaymentConfirmation, setShowPaymentConfirmation] = useState(false);
-  
-  const { isConnected, isCorrectNetwork } = useWallet();
 
   const vehicles = mockVehicles.filter(v => v.customerId === '3');
   const services = mockServiceTypes;
@@ -41,36 +31,19 @@ export default function BookServicePage() {
   const service = services.find(s => s.id === selectedService);
 
   const handleConfirm = () => {
-    if (paymentMethod === 'x402') {
-      setShowPaymentConfirmation(true);
-    } else {
-      toast.success('Service booked successfully! M-Pesa prompt sent.');
-      resetBooking();
-    }
+    toast.success('Service booked successfully! M-Pesa prompt sent to ' + phone);
+    resetBooking();
   };
 
   const resetBooking = () => {
     setStep('vehicle');
     setSelectedVehicle(null);
     setSelectedService(null);
-    setPaymentMethod(null);
-    setSelectedStablecoin(null);
-    setShowPaymentConfirmation(false);
-  };
-
-  const handlePaymentSuccess = () => {
-    toast.success('Payment successful! Service booked.');
-    resetBooking();
-  };
-
-  const canProceedToConfirm = () => {
-    if (paymentMethod === 'mpesa') return !!phone;
-    if (paymentMethod === 'x402') return isConnected && isCorrectNetwork && !!selectedStablecoin;
-    return false;
+    setPhone('');
   };
 
   return (
-    <CustomerLayout title="Book a Service" subtitle="Schedule your next car service">
+    <CustomerLayout title="Book a Service" subtitle="Schedule your next car wash">
       {/* Progress */}
       <div className="flex items-center gap-2 mb-6 overflow-x-auto pb-2">
         {(['vehicle', 'service', 'payment', 'confirm'] as BookingStep[]).map((s, i) => (
@@ -84,13 +57,13 @@ export default function BookServicePage() {
                 ? 'bg-primary text-primary-foreground' 
                 : s === 'vehicle' && selectedVehicle || 
                   s === 'service' && selectedService ||
-                  s === 'payment' && paymentMethod
+                  s === 'payment' && phone
                 ? 'bg-success/10 text-success'
                 : 'bg-muted text-muted-foreground'
             }`}>
               {s === 'vehicle' && selectedVehicle || 
                s === 'service' && selectedService ||
-               s === 'payment' && paymentMethod ? (
+               s === 'payment' && phone ? (
                 <Check className="h-4 w-4" />
               ) : (
                 <span>{i + 1}</span>
@@ -200,11 +173,11 @@ export default function BookServicePage() {
         </div>
       )}
 
-      {/* Step: Payment */}
+      {/* Step: Payment - M-Pesa Only */}
       {step === 'payment' && (
         <div className="space-y-4 animate-slide-up">
           <div className="flex items-center justify-between">
-            <h2 className="text-lg font-semibold">Payment Method</h2>
+            <h2 className="text-lg font-semibold">Payment (M-Pesa)</h2>
             <Button variant="ghost" size="sm" onClick={() => setStep('service')}>
               Change service
             </Button>
@@ -222,80 +195,36 @@ export default function BookServicePage() {
             </CardContent>
           </Card>
 
-          <div className="grid gap-3">
-            <Card 
-              variant={paymentMethod === 'mpesa' ? 'accent' : 'interactive'}
-              onClick={() => { setPaymentMethod('mpesa'); setSelectedStablecoin(null); }}
-            >
-              <CardContent className="py-4">
-                <div className="flex items-center gap-4">
-                  <div className={`h-12 w-12 rounded-xl flex items-center justify-center ${
-                    paymentMethod === 'mpesa' ? 'bg-success/20' : 'bg-muted'
-                  }`}>
-                    <Smartphone className={`h-6 w-6 ${paymentMethod === 'mpesa' ? 'text-success' : 'text-muted-foreground'}`} />
-                  </div>
-                  <div className="flex-1">
-                    <p className="font-semibold">M-Pesa</p>
-                    <p className="text-sm text-muted-foreground">Pay with mobile money</p>
-                  </div>
-                  {paymentMethod === 'mpesa' && <Check className="h-5 w-5 text-success" />}
+          <Card variant="accent">
+            <CardContent className="py-4">
+              <div className="flex items-center gap-4">
+                <div className="h-12 w-12 rounded-xl flex items-center justify-center bg-success/20">
+                  <Smartphone className="h-6 w-6 text-success" />
                 </div>
-              </CardContent>
-            </Card>
+                <div className="flex-1">
+                  <p className="font-semibold">M-Pesa</p>
+                  <p className="text-sm text-muted-foreground">Pay with mobile money</p>
+                </div>
+                <Check className="h-5 w-5 text-success" />
+              </div>
+            </CardContent>
+          </Card>
 
-            <Card 
-              variant={paymentMethod === 'x402' ? 'accent' : 'interactive'}
-              onClick={() => setPaymentMethod('x402')}
-            >
-              <CardContent className="py-4">
-                <div className="flex items-center gap-4">
-                  <div className={`h-12 w-12 rounded-xl flex items-center justify-center ${
-                    paymentMethod === 'x402' ? 'bg-primary/20' : 'bg-muted'
-                  }`}>
-                    <svg className={`h-6 w-6 ${paymentMethod === 'x402' ? 'text-primary' : 'text-muted-foreground'}`} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                      <path d="M19 7V4a1 1 0 0 0-1-1H5a2 2 0 0 0 0 4h15a1 1 0 0 1 1 1v4h-3a2 2 0 0 0 0 4h3a1 1 0 0 0 1-1v-2a1 1 0 0 0-1-1" />
-                      <path d="M3 5v14a2 2 0 0 0 2 2h15a1 1 0 0 0 1-1v-4" />
-                    </svg>
-                  </div>
-                  <div className="flex-1">
-                    <p className="font-semibold">X402 Stablecoin</p>
-                    <p className="text-sm text-muted-foreground">Pay with USDC or USDT</p>
-                  </div>
-                  {paymentMethod === 'x402' && <Check className="h-5 w-5 text-primary" />}
-                </div>
-              </CardContent>
-            </Card>
+          <div className="space-y-2">
+            <Label>M-Pesa Phone Number</Label>
+            <Input 
+              type="tel" 
+              placeholder="+254 712 345 678"
+              value={phone}
+              onChange={(e) => setPhone(e.target.value)}
+            />
+            <p className="text-xs text-muted-foreground">You'll receive an STK push to confirm payment</p>
           </div>
-
-          {paymentMethod === 'mpesa' && (
-            <div className="space-y-2 animate-fade-in">
-              <Label>M-Pesa Phone Number</Label>
-              <Input 
-                type="tel" 
-                placeholder="+254 712 345 678"
-                value={phone}
-                onChange={(e) => setPhone(e.target.value)}
-              />
-            </div>
-          )}
-
-          {paymentMethod === 'x402' && (
-            <div className="space-y-4 animate-fade-in">
-              <WalletConnect />
-              {isConnected && isCorrectNetwork && (
-                <StablecoinSelector 
-                  selected={selectedStablecoin}
-                  onSelect={setSelectedStablecoin}
-                  amountKes={service?.price || 0}
-                />
-              )}
-            </div>
-          )}
 
           <Button 
             variant="hero" 
             className="w-full" 
-            disabled={!canProceedToConfirm()}
+            disabled={!phone}
             onClick={() => setStep('confirm')}
           >
             Continue to Confirm
@@ -304,7 +233,7 @@ export default function BookServicePage() {
       )}
 
       {/* Step: Confirm */}
-      {step === 'confirm' && !showPaymentConfirmation && (
+      {step === 'confirm' && (
         <div className="space-y-4 animate-slide-up">
           <h2 className="text-lg font-semibold">Confirm Booking</h2>
 
@@ -333,10 +262,8 @@ export default function BookServicePage() {
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-sm text-muted-foreground">Payment</p>
-                  <p className="font-semibold">
-                    {paymentMethod === 'mpesa' ? 'M-Pesa' : `X402 (${selectedStablecoin?.toUpperCase()})`}
-                  </p>
-                  {paymentMethod === 'mpesa' && <p className="text-sm text-muted-foreground">{phone}</p>}
+                  <p className="font-semibold">M-Pesa</p>
+                  <p className="text-sm text-muted-foreground">{phone}</p>
                 </div>
                 <p className="text-2xl font-bold">KES {service?.price.toLocaleString()}</p>
               </div>
@@ -352,16 +279,6 @@ export default function BookServicePage() {
             </Button>
           </div>
         </div>
-      )}
-
-      {/* X402 Payment Flow */}
-      {showPaymentConfirmation && service && selectedStablecoin && (
-        <PaymentConfirmation
-          amountKes={service.price}
-          stablecoin={selectedStablecoin}
-          onConfirm={handlePaymentSuccess}
-          onCancel={() => setShowPaymentConfirmation(false)}
-        />
       )}
     </CustomerLayout>
   );
