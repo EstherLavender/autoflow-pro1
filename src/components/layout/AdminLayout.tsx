@@ -9,11 +9,10 @@ import {
   Gift, 
   BarChart3, 
   Settings,
-  Car,
+  Droplets,
   LogOut,
   Menu,
-  X,
-  Landmark
+  X
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/context/AuthContext';
@@ -32,7 +31,6 @@ const navItems: NavItem[] = [
   { label: 'Inventory', icon: Package, href: '/admin/inventory' },
   { label: 'Staff', icon: Users, href: '/admin/staff' },
   { label: 'Payments', icon: CreditCard, href: '/admin/payments' },
-  { label: 'Off-Ramp', icon: Landmark, href: '/admin/off-ramp' },
   { label: 'Loyalty', icon: Gift, href: '/admin/loyalty' },
   { label: 'Analytics', icon: BarChart3, href: '/admin/analytics' },
   { label: 'Settings', icon: Settings, href: '/admin/settings' },
@@ -61,9 +59,9 @@ export default function AdminLayout({ children, title, subtitle }: AdminLayoutPr
       <header className="lg:hidden sticky top-0 z-50 bg-card border-b border-border px-4 py-3 flex items-center justify-between">
         <div className="flex items-center gap-2">
           <div className="h-8 w-8 rounded-lg bg-primary flex items-center justify-center">
-            <Car className="h-4 w-4 text-primary-foreground" />
+            <Droplets className="h-4 w-4 text-primary-foreground" />
           </div>
-          <span className="font-semibold">X402 CareCare</span>
+          <span className="font-semibold">TRACK WASH</span>
         </div>
         <Button variant="ghost" size="icon" onClick={() => setSidebarOpen(!sidebarOpen)}>
           {sidebarOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
@@ -88,10 +86,10 @@ export default function AdminLayout({ children, title, subtitle }: AdminLayoutPr
           <div className="p-5 border-b border-sidebar-border">
             <div className="flex items-center gap-2">
               <div className="h-10 w-10 rounded-xl bg-sidebar-primary flex items-center justify-center shadow-glow">
-                <Car className="h-5 w-5 text-sidebar-primary-foreground" />
+                <Droplets className="h-5 w-5 text-sidebar-primary-foreground" />
               </div>
               <div>
-                <span className="font-bold text-sidebar-foreground">X402 CareCare</span>
+                <span className="font-bold text-sidebar-foreground">TRACK WASH</span>
                 <p className="text-xs text-sidebar-foreground/60">Admin Dashboard</p>
               </div>
             </div>
@@ -133,7 +131,7 @@ export default function AdminLayout({ children, title, subtitle }: AdminLayoutPr
                   {user?.name || 'Admin User'}
                 </p>
                 <p className="text-xs text-sidebar-foreground/60 truncate">
-                  {user?.email || 'admin@x402.com'}
+                  Car Wash Owner
                 </p>
               </div>
             </div>

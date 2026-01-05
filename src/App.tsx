@@ -4,7 +4,6 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { AuthProvider, useAuth } from "@/context/AuthContext";
-import { WalletProvider } from "@/context/WalletContext";
 
 // Pages
 import LandingPage from "./pages/LandingPage";
@@ -17,7 +16,6 @@ import ServicesPage from "./pages/admin/ServicesPage";
 import InventoryPage from "./pages/admin/InventoryPage";
 import PaymentsPage from "./pages/admin/PaymentsPage";
 import LoyaltyPage from "./pages/admin/LoyaltyPage";
-import OffRampPage from "./pages/admin/OffRampPage";
 
 // Operator Pages
 import OperatorDashboard from "./pages/operator/OperatorDashboard";
@@ -26,9 +24,6 @@ import OperatorDashboard from "./pages/operator/OperatorDashboard";
 import CustomerDashboard from "./pages/customer/CustomerDashboard";
 import BookServicePage from "./pages/customer/BookServicePage";
 import RewardsPage from "./pages/customer/RewardsPage";
-import InvoicesPage from "./pages/customer/InvoicesPage";
-import NotificationsPage from "./pages/customer/NotificationsPage";
-import DiagnosePage from "./pages/customer/DiagnosePage";
 import GaragesPage from "./pages/customer/GaragesPage";
 import WashPage from "./pages/customer/WashPage";
 
@@ -75,11 +70,6 @@ function AppRoutes() {
       <Route path="/admin/payments" element={
         <ProtectedRoute allowedRoles={['admin']}>
           <PaymentsPage />
-        </ProtectedRoute>
-      } />
-      <Route path="/admin/off-ramp" element={
-        <ProtectedRoute allowedRoles={['admin']}>
-          <OffRampPage />
         </ProtectedRoute>
       } />
       <Route path="/admin/loyalty" element={
@@ -141,21 +131,6 @@ function AppRoutes() {
           <RewardsPage />
         </ProtectedRoute>
       } />
-      <Route path="/customer/invoices" element={
-        <ProtectedRoute allowedRoles={['customer']}>
-          <InvoicesPage />
-        </ProtectedRoute>
-      } />
-      <Route path="/customer/notifications" element={
-        <ProtectedRoute allowedRoles={['customer']}>
-          <NotificationsPage />
-        </ProtectedRoute>
-      } />
-      <Route path="/customer/diagnose" element={
-        <ProtectedRoute allowedRoles={['customer']}>
-          <DiagnosePage />
-        </ProtectedRoute>
-      } />
       <Route path="/customer/garages" element={
         <ProtectedRoute allowedRoles={['customer']}>
           <GaragesPage />
@@ -164,11 +139,6 @@ function AppRoutes() {
       <Route path="/customer/wash" element={
         <ProtectedRoute allowedRoles={['customer']}>
           <WashPage />
-        </ProtectedRoute>
-      } />
-      <Route path="/customer/rescue" element={
-        <ProtectedRoute allowedRoles={['customer']}>
-          <CustomerDashboard />
         </ProtectedRoute>
       } />
       
@@ -181,15 +151,13 @@ function AppRoutes() {
 const App = () => (
   <QueryClientProvider client={queryClient}>
     <AuthProvider>
-      <WalletProvider>
-        <TooltipProvider>
-          <Toaster />
-          <Sonner />
-          <BrowserRouter>
-            <AppRoutes />
-          </BrowserRouter>
-        </TooltipProvider>
-      </WalletProvider>
+      <TooltipProvider>
+        <Toaster />
+        <Sonner />
+        <BrowserRouter>
+          <AppRoutes />
+        </BrowserRouter>
+      </TooltipProvider>
     </AuthProvider>
   </QueryClientProvider>
 );

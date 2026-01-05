@@ -1,32 +1,29 @@
 import { useState } from 'react';
-import { Car, Mail, Phone, ArrowRight, Loader2 } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
+import { Droplets, User, Shield, Wrench, Mail, Phone, ArrowRight, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/context/AuthContext';
 import { UserRole } from '@/types';
 import { toast } from 'sonner';
 
 type AuthMode = 'login' | 'signup';
-type LoginMethod = 'email' | 'phone';
 
-const roleDescriptions: Record<UserRole, string> = {
-  admin: 'Manage your business, staff, and analytics',
-  operator: 'Handle daily jobs and service tasks',
-  customer: 'Track your vehicles and services',
-  garage_partner: 'Manage your garage location',
-  mobile_provider: 'Provide mobile services',
-};
+const roles: { id: UserRole; label: string; description: string; icon: React.ElementType }[] = [
+  { id: 'customer', label: 'Car Owner', description: 'Book a wash & earn rewards', icon: User },
+  { id: 'operator', label: 'Detailer', description: 'Manage your jobs & tips', icon: Wrench },
+  { id: 'admin', label: 'Car Wash Owner', description: 'Run your business', icon: Shield },
+];
 
 export default function LoginPage() {
   const navigate = useNavigate();
   const { login } = useAuth();
   const [mode, setMode] = useState<AuthMode>('login');
-  const [method, setMethod] = useState<LoginMethod>('phone');
   const [selectedRole, setSelectedRole] = useState<UserRole>('customer');
   const [isLoading, setIsLoading] = useState(false);
+  const [inviteCode, setInviteCode] = useState('');
   const [formData, setFormData] = useState({
     email: '',
     phone: '',
@@ -35,21 +32,30 @@ export default function LoginPage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    
+    if (selectedRole === 'operator' && !inviteCode && mode === 'login') {
+      toast.error('Please enter your invite code');
+      return;
+    }
+
+    if (mode === 'signup' && (!formData.email || !formData.phone)) {
+      toast.error('Please fill in all fields');
+      return;
+    }
+    
     setIsLoading(true);
     
     // Simulate API call
-    await new Promise(resolve => setTimeout(resolve, 1000));
+    await new Promise(resolve => setTimeout(resolve, 800));
     
     login(selectedRole);
-    toast.success(`Welcome! Logged in as ${selectedRole}`);
+    toast.success('Welcome to Track Wash!');
     
     // Navigate to appropriate dashboard
     const routes: Record<UserRole, string> = {
       admin: '/admin',
       operator: '/operator',
       customer: '/customer',
-      garage_partner: '/garage',
-      mobile_provider: '/mobile',
     };
     navigate(routes[selectedRole]);
     setIsLoading(false);
@@ -61,9 +67,9 @@ export default function LoginPage() {
         {/* Logo */}
         <div className="flex items-center justify-center gap-2 mb-8">
           <div className="h-12 w-12 rounded-xl bg-primary flex items-center justify-center shadow-glow">
-            <Car className="h-6 w-6 text-primary-foreground" />
+            <Droplets className="h-6 w-6 text-primary-foreground" />
           </div>
-          <span className="text-2xl font-bold">X402 CareCare</span>
+          <span className="text-2xl font-bold">TRACK WASH</span>
         </div>
 
         <Card variant="elevated" className="animate-slide-up">
@@ -73,8 +79,8 @@ export default function LoginPage() {
             </CardTitle>
             <CardDescription>
               {mode === 'login' 
-                ? 'Sign in to manage your car business'
-                : 'Start your free trial today'
+                ? 'Sign in to your account'
+                : 'Join Nairobi\'s favorite car wash platform'
               }
             </CardDescription>
           </CardHeader>
@@ -82,88 +88,81 @@ export default function LoginPage() {
           <CardContent className="pt-4">
             <form onSubmit={handleSubmit} className="space-y-5">
               {/* Role Selection */}
-              <div className="space-y-2">
+              <div className="space-y-3">
                 <Label>I am a...</Label>
-                <div className="grid grid-cols-3 gap-2">
-                  {(['customer', 'operator', 'admin'] as UserRole[]).map((role) => (
+                <div className="grid gap-2">
+                  {roles.map((role) => (
                     <button
-                      key={role}
+                      key={role.id}
                       type="button"
-                      onClick={() => setSelectedRole(role)}
-                      className={`p-3 rounded-lg border text-sm font-medium transition-all ${
-                        selectedRole === role
-                          ? 'bg-primary text-primary-foreground border-primary shadow-md'
-                          : 'bg-card border-border hover:border-primary/50'
+                      onClick={() => setSelectedRole(role.id)}
+                      className={`flex items-center gap-3 p-3 rounded-lg border transition-all text-left ${
+                        selectedRole === role.id
+                          ? 'border-primary bg-primary/5'
+                          : 'border-border hover:border-primary/50'
                       }`}
                     >
-                      {role.charAt(0).toUpperCase() + role.slice(1)}
+                      <div className={`h-10 w-10 rounded-lg flex items-center justify-center ${
+                        selectedRole === role.id ? 'bg-primary/10' : 'bg-muted'
+                      }`}>
+                        <role.icon className={`h-5 w-5 ${
+                          selectedRole === role.id ? 'text-primary' : 'text-muted-foreground'
+                        }`} />
+                      </div>
+                      <div className="flex-1">
+                        <p className="font-medium">{role.label}</p>
+                        <p className="text-xs text-muted-foreground">{role.description}</p>
+                      </div>
                     </button>
                   ))}
                 </div>
-                <p className="text-xs text-muted-foreground text-center mt-2">
-                  {roleDescriptions[selectedRole]}
-                </p>
               </div>
 
-              {/* Login Method Toggle */}
-              <div className="flex rounded-lg bg-muted p-1">
-                <button
-                  type="button"
-                  onClick={() => setMethod('phone')}
-                  className={`flex-1 flex items-center justify-center gap-2 py-2 rounded-md text-sm font-medium transition-all ${
-                    method === 'phone' ? 'bg-card shadow-sm' : ''
-                  }`}
-                >
-                  <Phone className="h-4 w-4" />
-                  Phone
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setMethod('email')}
-                  className={`flex-1 flex items-center justify-center gap-2 py-2 rounded-md text-sm font-medium transition-all ${
-                    method === 'email' ? 'bg-card shadow-sm' : ''
-                  }`}
-                >
-                  <Mail className="h-4 w-4" />
-                  Email
-                </button>
-              </div>
-
-              {/* Name (Signup only) */}
-              {mode === 'signup' && (
-                <div className="space-y-2">
-                  <Label htmlFor="name">Full Name</Label>
-                  <Input
-                    id="name"
-                    placeholder="John Kamau"
-                    value={formData.name}
-                    onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+              {/* Invite Code for Operators */}
+              {selectedRole === 'operator' && mode === 'login' && (
+                <div className="space-y-2 animate-fade-in">
+                  <Label>Invite Code</Label>
+                  <Input 
+                    placeholder="Enter your invite code"
+                    value={inviteCode}
+                    onChange={(e) => setInviteCode(e.target.value)}
                   />
+                  <p className="text-xs text-muted-foreground">Get this from your car wash owner</p>
                 </div>
               )}
 
-              {/* Phone/Email Input */}
-              {method === 'phone' ? (
-                <div className="space-y-2">
-                  <Label htmlFor="phone">Phone Number</Label>
-                  <Input
-                    id="phone"
-                    type="tel"
-                    placeholder="+254 712 345 678"
-                    value={formData.phone}
-                    onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-                  />
-                </div>
-              ) : (
-                <div className="space-y-2">
-                  <Label htmlFor="email">Email Address</Label>
-                  <Input
-                    id="email"
-                    type="email"
-                    placeholder="you@example.com"
-                    value={formData.email}
-                    onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                  />
+              {/* Signup fields */}
+              {mode === 'signup' && (
+                <div className="space-y-4 animate-fade-in">
+                  <div className="space-y-2">
+                    <Label htmlFor="name">Full Name</Label>
+                    <Input
+                      id="name"
+                      placeholder="John Kamau"
+                      value={formData.name}
+                      onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="email">Email</Label>
+                    <Input
+                      id="email"
+                      type="email"
+                      placeholder="you@example.com"
+                      value={formData.email}
+                      onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="phone">Phone Number (M-Pesa)</Label>
+                    <Input
+                      id="phone"
+                      type="tel"
+                      placeholder="+254 712 345 678"
+                      value={formData.phone}
+                      onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
+                    />
+                  </div>
                 </div>
               )}
 

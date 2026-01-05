@@ -1,5 +1,5 @@
 import { AlertTriangle, CheckCircle, Clock, Wrench, MapPin, ArrowRight } from 'lucide-react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { AIDiagnosis } from '@/types';
@@ -15,7 +15,6 @@ const urgencyConfig = {
   low: { color: 'success', label: 'Low Priority', icon: CheckCircle },
   medium: { color: 'warning', label: 'Moderate', icon: Clock },
   high: { color: 'destructive', label: 'High Priority', icon: AlertTriangle },
-  critical: { color: 'destructive', label: 'Critical', icon: AlertTriangle },
 } as const;
 
 const recommendationConfig = {
@@ -79,7 +78,7 @@ export default function DiagnosisResult({ diagnosis, onFindGarage, onScheduleSer
       {/* Main Result Card */}
       <Card variant="elevated" className="overflow-hidden">
         <div className={`p-4 ${
-          diagnosis.urgency === 'critical' || diagnosis.urgency === 'high' 
+          diagnosis.urgency === 'high' 
             ? 'bg-destructive/10' 
             : diagnosis.urgency === 'medium' 
               ? 'bg-warning/10' 
@@ -87,14 +86,14 @@ export default function DiagnosisResult({ diagnosis, onFindGarage, onScheduleSer
         }`}>
           <div className="flex items-center gap-3">
             <div className={`h-12 w-12 rounded-full flex items-center justify-center ${
-              diagnosis.urgency === 'critical' || diagnosis.urgency === 'high'
+              diagnosis.urgency === 'high'
                 ? 'bg-destructive/20'
                 : diagnosis.urgency === 'medium'
                   ? 'bg-warning/20'
                   : 'bg-success/20'
             }`}>
               <UrgencyIcon className={`h-6 w-6 ${
-                diagnosis.urgency === 'critical' || diagnosis.urgency === 'high'
+                diagnosis.urgency === 'high'
                   ? 'text-destructive'
                   : diagnosis.urgency === 'medium'
                     ? 'text-warning'
