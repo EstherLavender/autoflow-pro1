@@ -1,12 +1,12 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Droplets, User, Shield, Wrench, Mail, Phone, ArrowRight, Loader2 } from 'lucide-react';
+import { Droplets, User, Shield, Wrench, ArrowRight, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useAuth } from '@/context/AuthContext';
-import { UserRole } from '@/types';
+import { UserRole } from '@/types/auth';
 import { toast } from 'sonner';
 
 type AuthMode = 'login' | 'signup';
@@ -19,11 +19,10 @@ const roles: { id: UserRole; label: string; description: string; icon: React.Ele
 
 export default function LoginPage() {
   const navigate = useNavigate();
-  const { login } = useAuth();
+  const { login, signup } = useAuth();
   const [mode, setMode] = useState<AuthMode>('login');
   const [selectedRole, setSelectedRole] = useState<UserRole>('customer');
   const [isLoading, setIsLoading] = useState(false);
-  const [inviteCode, setInviteCode] = useState('');
   const [formData, setFormData] = useState({
     email: '',
     phone: '',
@@ -32,33 +31,69 @@ export default function LoginPage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
-    if (selectedRole === 'operator' && !inviteCode && mode === 'login') {
-      toast.error('Please enter your invite code');
-      return;
-    }
-
-    if (mode === 'signup' && (!formData.email || !formData.phone)) {
-      toast.error('Please fill in all fields');
-      return;
-    }
-    
     setIsLoading(true);
-    
-    // Simulate API call
-    await new Promise(resolve => setTimeout(resolve, 800));
-    
-    login(selectedRole);
-    toast.success('Welcome to Track Wash!');
-    
-    // Navigate to appropriate dashboard
-    const routes: Record<UserRole, string> = {
-      admin: '/admin',
-      operator: '/operator',
-      customer: '/customer',
-    };
-    navigate(routes[selectedRole]);
-    setIsLoading(false);
+
+    try {
+      if (mode === 'signup') {
+        // Validate signup fields
+        if (!formData.phone) {
+          toast.error('Phone number is required');
+          setIsLoading(false);
+          return;
+        }
+        if (selectedRole === 'customer' && !formData.email) {
+          toast.error('Email is required for customers');
+          setIsLoading(false);
+          return;
+        }
+
+        const user = await signup({
+          role: selectedRole,
+          email: formData.email || undefined,
+          phone: formData.phone,
+          name: formData.name,
+        });
+
+        toast.success('Account created! Complete your profile to continue.');
+        navigate('/onboarding');
+      } else {
+        // Login
+        const identifier = formData.email || formData.phone;
+        if (!identifier) {
+          toast.error('Please enter your email or phone number');
+          setIsLoading(false);
+          return;
+        }
+
+        const user = await login(identifier);
+
+        toast.success('Welcome back!');
+
+        // Check if onboarding is complete
+        if (user.onboardingStatus === 'incomplete') {
+          navigate('/onboarding');
+          return;
+        }
+
+        // Check if pending approval
+        if (user.status === 'pending') {
+          navigate('/pending-approval');
+          return;
+        }
+
+        // Navigate to role-specific dashboard
+        const routes: Record<UserRole, string> = {
+          admin: '/admin',
+          operator: '/operator',
+          customer: '/customer',
+        };
+        navigate(routes[user.role]);
+      }
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : 'Something went wrong');
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -80,60 +115,49 @@ export default function LoginPage() {
             <CardDescription>
               {mode === 'login' 
                 ? 'Sign in to your account'
-                : 'Join Nairobi\'s favorite car wash platform'
+                : "Join Nairobi's favorite car wash platform"
               }
             </CardDescription>
           </CardHeader>
           
           <CardContent className="pt-4">
             <form onSubmit={handleSubmit} className="space-y-5">
-              {/* Role Selection */}
-              <div className="space-y-3">
-                <Label>I am a...</Label>
-                <div className="grid gap-2">
-                  {roles.map((role) => (
-                    <button
-                      key={role.id}
-                      type="button"
-                      onClick={() => setSelectedRole(role.id)}
-                      className={`flex items-center gap-3 p-3 rounded-lg border transition-all text-left ${
-                        selectedRole === role.id
-                          ? 'border-primary bg-primary/5'
-                          : 'border-border hover:border-primary/50'
-                      }`}
-                    >
-                      <div className={`h-10 w-10 rounded-lg flex items-center justify-center ${
-                        selectedRole === role.id ? 'bg-primary/10' : 'bg-muted'
-                      }`}>
-                        <role.icon className={`h-5 w-5 ${
-                          selectedRole === role.id ? 'text-primary' : 'text-muted-foreground'
-                        }`} />
-                      </div>
-                      <div className="flex-1">
-                        <p className="font-medium">{role.label}</p>
-                        <p className="text-xs text-muted-foreground">{role.description}</p>
-                      </div>
-                    </button>
-                  ))}
-                </div>
-              </div>
-
-              {/* Invite Code for Operators */}
-              {selectedRole === 'operator' && mode === 'login' && (
-                <div className="space-y-2 animate-fade-in">
-                  <Label>Invite Code</Label>
-                  <Input 
-                    placeholder="Enter your invite code"
-                    value={inviteCode}
-                    onChange={(e) => setInviteCode(e.target.value)}
-                  />
-                  <p className="text-xs text-muted-foreground">Get this from your car wash owner</p>
+              {/* Role Selection - Only for signup */}
+              {mode === 'signup' && (
+                <div className="space-y-3">
+                  <Label>I am a...</Label>
+                  <div className="grid gap-2">
+                    {roles.map((role) => (
+                      <button
+                        key={role.id}
+                        type="button"
+                        onClick={() => setSelectedRole(role.id)}
+                        className={`flex items-center gap-3 p-3 rounded-lg border transition-all text-left ${
+                          selectedRole === role.id
+                            ? 'border-primary bg-primary/5'
+                            : 'border-border hover:border-primary/50'
+                        }`}
+                      >
+                        <div className={`h-10 w-10 rounded-lg flex items-center justify-center ${
+                          selectedRole === role.id ? 'bg-primary/10' : 'bg-muted'
+                        }`}>
+                          <role.icon className={`h-5 w-5 ${
+                            selectedRole === role.id ? 'text-primary' : 'text-muted-foreground'
+                          }`} />
+                        </div>
+                        <div className="flex-1">
+                          <p className="font-medium">{role.label}</p>
+                          <p className="text-xs text-muted-foreground">{role.description}</p>
+                        </div>
+                      </button>
+                    ))}
+                  </div>
                 </div>
               )}
 
-              {/* Signup fields */}
-              {mode === 'signup' && (
-                <div className="space-y-4 animate-fade-in">
+              {/* Login/Signup fields */}
+              <div className="space-y-4">
+                {mode === 'signup' && (
                   <div className="space-y-2">
                     <Label htmlFor="name">Full Name</Label>
                     <Input
@@ -143,26 +167,38 @@ export default function LoginPage() {
                       onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                     />
                   </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="email">Email</Label>
-                    <Input
-                      id="email"
-                      type="email"
-                      placeholder="you@example.com"
-                      value={formData.email}
-                      onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="phone">Phone Number (M-Pesa)</Label>
-                    <Input
-                      id="phone"
-                      type="tel"
-                      placeholder="+254 712 345 678"
-                      value={formData.phone}
-                      onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-                    />
-                  </div>
+                )}
+                
+                <div className="space-y-2">
+                  <Label htmlFor="email">Email {mode === 'login' && '(or Phone)'}</Label>
+                  <Input
+                    id="email"
+                    type="email"
+                    placeholder="you@example.com"
+                    value={formData.email}
+                    onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                  />
+                </div>
+                
+                <div className="space-y-2">
+                  <Label htmlFor="phone">Phone Number (M-Pesa)</Label>
+                  <Input
+                    id="phone"
+                    type="tel"
+                    placeholder="+254 712 345 678"
+                    value={formData.phone}
+                    onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
+                  />
+                </div>
+              </div>
+
+              {/* Demo accounts hint */}
+              {mode === 'login' && (
+                <div className="bg-muted/50 p-3 rounded-lg text-xs text-muted-foreground">
+                  <p className="font-medium mb-1">Demo accounts:</p>
+                  <p>Admin: admin@trackwash.co.ke</p>
+                  <p>Operator: operator@trackwash.co.ke</p>
+                  <p>Customer: customer@trackwash.co.ke</p>
                 </div>
               )}
 

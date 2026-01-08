@@ -52,8 +52,8 @@ export default function OperatorLayout({ children, title, subtitle }: OperatorLa
               <Car className="h-5 w-5 text-primary-foreground" />
             </div>
             <div>
-              <span className="font-bold text-sm">X402 CareCare</span>
-              <p className="text-xs text-muted-foreground">Operator</p>
+              <span className="font-bold text-sm">TRACK WASH</span>
+              <p className="text-xs text-muted-foreground">Detailer</p>
             </div>
           </div>
 
@@ -85,7 +85,7 @@ export default function OperatorLayout({ children, title, subtitle }: OperatorLa
 
             <div className="h-8 w-8 rounded-full bg-accent flex items-center justify-center ml-2">
               <span className="text-xs font-semibold text-accent-foreground">
-                {user?.name?.charAt(0) || 'O'}
+                {user?.email?.charAt(0).toUpperCase() || 'O'}
               </span>
             </div>
           </div>
