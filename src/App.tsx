@@ -9,6 +9,8 @@ import { AuthProvider, useAuth } from "@/context/AuthContext";
 import LandingPage from "./pages/LandingPage";
 import LoginPage from "./pages/LoginPage";
 import NotFound from "./pages/NotFound";
+import PendingApprovalPage from "./pages/PendingApprovalPage";
+import OnboardingRouter from "./pages/onboarding/OnboardingRouter";
 
 // Admin Pages
 import AdminDashboard from "./pages/admin/AdminDashboard";
@@ -16,6 +18,7 @@ import ServicesPage from "./pages/admin/ServicesPage";
 import InventoryPage from "./pages/admin/InventoryPage";
 import PaymentsPage from "./pages/admin/PaymentsPage";
 import LoyaltyPage from "./pages/admin/LoyaltyPage";
+import ApprovalsPage from "./pages/admin/ApprovalsPage";
 
 // Operator Pages
 import OperatorDashboard from "./pages/operator/OperatorDashboard";
@@ -29,16 +32,40 @@ import WashPage from "./pages/customer/WashPage";
 
 const queryClient = new QueryClient();
 
-// Protected route wrapper
+// Protected route wrapper with onboarding & approval checks
 function ProtectedRoute({ children, allowedRoles }: { children: React.ReactNode; allowedRoles: string[] }) {
-  const { user, isAuthenticated } = useAuth();
+  const { user, isAuthenticated, isLoading } = useAuth();
   
-  if (!isAuthenticated) {
-    return <Navigate to="/login" replace />;
+  if (isLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="animate-spin h-8 w-8 border-2 border-primary border-t-transparent rounded-full" />
+      </div>
+    );
   }
   
-  if (user && !allowedRoles.includes(user.role)) {
-    return <Navigate to="/" replace />;
+  if (!isAuthenticated || !user) {
+    return <Navigate to="/login" replace />;
+  }
+
+  // Check if onboarding is complete
+  if (user.onboardingStatus === 'incomplete') {
+    return <Navigate to="/onboarding" replace />;
+  }
+
+  // Check if pending approval (for admin/operator)
+  if (user.status === 'pending' && (user.role === 'admin' || user.role === 'operator')) {
+    return <Navigate to="/pending-approval" replace />;
+  }
+  
+  if (!allowedRoles.includes(user.role)) {
+    // Redirect to their own dashboard instead of home
+    const routes = {
+      admin: '/admin',
+      operator: '/operator',
+      customer: '/customer',
+    };
+    return <Navigate to={routes[user.role]} replace />;
   }
   
   return <>{children}</>;
@@ -50,6 +77,8 @@ function AppRoutes() {
       {/* Public Routes */}
       <Route path="/" element={<LandingPage />} />
       <Route path="/login" element={<LoginPage />} />
+      <Route path="/onboarding" element={<OnboardingRouter />} />
+      <Route path="/pending-approval" element={<PendingApprovalPage />} />
       
       {/* Admin Routes */}
       <Route path="/admin" element={
@@ -75,6 +104,11 @@ function AppRoutes() {
       <Route path="/admin/loyalty" element={
         <ProtectedRoute allowedRoles={['admin']}>
           <LoyaltyPage />
+        </ProtectedRoute>
+      } />
+      <Route path="/admin/approvals" element={
+        <ProtectedRoute allowedRoles={['admin']}>
+          <ApprovalsPage />
         </ProtectedRoute>
       } />
       <Route path="/admin/staff" element={

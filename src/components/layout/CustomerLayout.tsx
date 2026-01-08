@@ -65,7 +65,7 @@ export default function CustomerLayout({ children, title, subtitle }: CustomerLa
             </Button>
 
             <div className="hidden md:flex items-center gap-3">
-              <span className="text-sm font-medium">{user?.name}</span>
+              <span className="text-sm font-medium">{user?.email || user?.phone}</span>
               <Button variant="ghost" size="icon" onClick={handleLogout}>
                 <LogOut className="h-4 w-4" />
               </Button>
@@ -73,7 +73,7 @@ export default function CustomerLayout({ children, title, subtitle }: CustomerLa
 
             <div className="md:hidden h-8 w-8 rounded-full bg-accent flex items-center justify-center">
               <span className="text-xs font-semibold text-accent-foreground">
-                {user?.name?.charAt(0) || 'C'}
+                {user?.email?.charAt(0).toUpperCase() || 'C'}
               </span>
             </div>
           </div>
