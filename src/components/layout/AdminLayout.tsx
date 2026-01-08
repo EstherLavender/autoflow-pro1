@@ -123,12 +123,12 @@ export default function AdminLayout({ children, title, subtitle }: AdminLayoutPr
             <div className="flex items-center gap-3 mb-3">
               <div className="h-10 w-10 rounded-full bg-sidebar-accent flex items-center justify-center">
                 <span className="text-sm font-semibold text-sidebar-accent-foreground">
-                  {user?.name?.charAt(0) || 'A'}
+                  {user?.email?.charAt(0).toUpperCase() || 'A'}
                 </span>
               </div>
               <div className="flex-1 min-w-0">
                 <p className="text-sm font-medium text-sidebar-foreground truncate">
-                  {user?.name || 'Admin User'}
+                  {user?.email || user?.phone || 'Admin User'}
                 </p>
                 <p className="text-xs text-sidebar-foreground/60 truncate">
                   Car Wash Owner
