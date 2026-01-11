@@ -1,73 +1,280 @@
-# Welcome to your Lovable project
 
-## Project info
+TRACKWASH — SYSTEM DESIGN & IMPLEMENTATION DOCUMENTATION
 
-**URL**: https://lovable.dev/projects/REPLACE_WITH_PROJECT_ID
+Version: 1.0
+Status: MVP → Production
+Audience: Engineers, Product, Payments, Ops
+Last Updated: Jan 2026
 
-## How can I edit this code?
+⸻
 
-There are several ways of editing your application.
+1. PRODUCT OVERVIEW
 
-**Use Lovable**
+1.1 What is TrackWash?
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/REPLACE_WITH_PROJECT_ID) and start prompting.
+TrackWash is a multi-role car wash management and payment platform enabling:
+	•	Car wash owners to manage branches, staff, revenue
+	•	Detailers to receive jobs & payouts
+	•	Customers to pay via M-Pesa or Crypto (Stablecoins)
+	•	Admins to approve, monitor, and settle payments
 
-Changes made via Lovable will be committed automatically to this repo.
+1.2 Core Value Proposition
+	•	Unified fiat + crypto payments
+	•	Instant settlement to M-Pesa Paybill
+	•	Transparent, auditable transactions
+	•	Mobile-first, QR-based payments (Tando-like UX)
 
-**Use your preferred IDE**
+⸻
 
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
+2. USER ROLES & PERMISSIONS
 
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
+2.1 Roles
 
-Follow these steps:
+Role	Description
+Super Admin	Platform owner
+Car Wash Owner	Business admin
+Detailer	Service provider
+Customer	End user
 
-```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
+2.2 Permission Matrix
 
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
+Feature	Admin	Owner	Detailer	Customer
+View dashboard	✅	✅	✅	✅
+Receive payments	❌	✅	✅	❌
+Make payments	❌	❌	❌	✅
+Approvals	✅	❌	❌	❌
 
-# Step 3: Install the necessary dependencies.
-npm i
 
-# Step 4: Start the development server with auto-reloading and an instant preview.
-npm run dev
-```
+⸻
 
-**Edit a file directly in GitHub**
+3. SYSTEM ARCHITECTURE
 
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
+3.1 High-Level Architecture
 
-**Use GitHub Codespaces**
+Frontend (Web / Mobile)
+        ↓
+Backend API (Node / Nest / Supabase)
+        ↓
+Database (Postgres)
+        ↓
+Payment Rails
+   ├─ M-Pesa Paybill
+   └─ Crypto → Fiat Provider
 
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
+3.2 Key External Integrations
+	•	Safaricom — M-Pesa Paybill
+	•	WalletConnect — Wallet connections
+	•	Transak / Yellow Card — Crypto → Fiat
 
-## What technologies are used for this project?
+⸻
 
-This project is built with:
+4. AUTHENTICATION & USER MANAGEMENT
 
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
+4.1 Auth Flow
+	•	Email + Password
+	•	Role assigned on signup
+	•	Session persisted (JWT)
 
-## How can I deploy this project?
+4.2 Signup Flow (Owner Example)
+	1.	Email + Password
+	2.	Role = OWNER
+	3.	Owner submits:
+	•	Name
+	•	ID
+	•	Phone
+	•	Wallet address
+	4.	Status = PENDING_APPROVAL
+	5.	Admin approves
 
-Simply open [Lovable](https://lovable.dev/projects/REPLACE_WITH_PROJECT_ID) and click on Share -> Publish.
+⸻
 
-## Can I connect a custom domain to my Lovable project?
+5. DATABASE SCHEMA (CORE)
 
-Yes, you can!
+5.1 Users
 
-To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
+users (
+  id UUID PK,
+  email UNIQUE,
+  phone,
+  role,
+  status,
+  created_at
+)
 
-Read more here: [Setting up a custom domain](https://docs.lovable.dev/features/custom-domain#custom-domain)
+5.2 Car Washes
+
+car_washes (
+  id UUID PK,
+  owner_id FK,
+  name,
+  wallet_id,
+  approved
+)
+
+5.3 Transactions
+
+transactions (
+  id UUID PK,
+  payer_id,
+  receiver_id,
+  amount,
+  currency,
+  method,
+  status,
+  reference
+)
+
+
+⸻
+
+6. PAYMENT SYSTEM DESIGN
+
+6.1 Fiat Payments (M-Pesa)
+
+Flow
+	1.	Customer enters phone + amount
+	2.	STK Push triggered
+	3.	User enters PIN
+	4.	Callback received
+	5.	Wallet credited
+
+Backend Rule
+	•	All M-Pesa logic server-side
+	•	Callbacks are authoritative
+
+⸻
+
+6.2 Crypto Payments (WalletConnect)
+
+Supported
+	•	USDC / USDT
+	•	Polygon / BSC
+
+Flow
+	1.	User connects wallet
+	2.	Signs transaction
+	3.	Tx hash verified
+	4.	Conversion triggered
+
+⸻
+
+6.3 Stablecoin → Fiat (Tando-Like)
+
+Flow
+
+User Wallet → Stablecoin Transfer
+           → Provider Conversion
+           → M-Pesa Paybill
+           → Car Wash Wallet
+
+Why This Works
+	•	User pays crypto
+	•	Merchant receives KES
+	•	Platform abstracts complexity
+
+⸻
+
+7. QR / SCAN-TO-PAY SYSTEM
+
+QR Payload
+
+{
+  "type": "TRACKWASH_PAY",
+  "merchantId": "xyz",
+  "amount": 800,
+  "currency": "KES"
+}
+
+UX
+	•	Same QR
+	•	Choose M-Pesa or Crypto
+	•	One settlement endpoint
+
+⸻
+
+8. INTERNAL WALLETS & LEDGER
+
+8.1 Internal Wallets
+
+Not blockchain wallets.
+
+wallet {
+  balance_fiat
+  balance_crypto
+}
+
+8.2 Ledger Rule
+	•	Balance = sum(transactions)
+	•	Never mutable manually
+
+⸻
+
+9. ADMIN & APPROVAL FLOWS
+
+Admin Capabilities
+	•	Approve onboarding
+	•	View all transactions
+	•	Freeze wallets
+	•	Initiate payouts
+
+⸻
+
+10. SECURITY & COMPLIANCE
+	•	Webhook signature verification
+	•	Environment-based secrets
+	•	Rate limiting
+	•	Audit logs
+	•	No private keys stored
+
+⸻
+
+11. DEPLOYMENT STRATEGY
+
+Environments
+	•	Dev
+	•	Staging
+	•	Production
+
+Secrets
+	•	.env
+	•	Vaulted in CI/CD
+
+⸻
+
+12. TESTING STRATEGY
+
+Type	Coverage
+Unit	Payments
+Integration	M-Pesa
+E2E	Pay → Settle
+Load	STK Push
+
+
+⸻
+
+13. MVP DELIVERY CHECKLIST
+
+✅ No mock data
+✅ Real payments
+✅ WalletConnect live
+✅ Admin approvals
+✅ Ledger consistency
+
+⸻
+
+14. FUTURE ROADMAP
+	•	NFC payments
+	•	Recurring subscriptions
+	•	Loyalty tokens
+	•	Multi-country expansion
+
+⸻
+
+15. HANDOFF NOTES FOR DEVELOPERS
+	•	Payments are event-driven
+	•	Frontend never trusts itself
+	•	Backend is source of truth
+	•	Every transaction is immutable
+
+
+👉 Tell me what you want next and I’ll deliver it immediately.
