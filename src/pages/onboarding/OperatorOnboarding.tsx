@@ -6,14 +6,13 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/com
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useAuth } from '@/context/AuthContext';
-import { OperatorProfile } from '@/types/auth';
 import { toast } from 'sonner';
 import KYCDocumentUpload from '@/components/kyc/KYCDocumentUpload';
 import PhoneVerification from '@/components/kyc/PhoneVerification';
 
 export default function OperatorOnboarding() {
   const navigate = useNavigate();
-  const { user, updateProfile, completeOnboarding } = useAuth();
+  const { user } = useAuth();
   const [step, setStep] = useState(1);
   const [isLoading, setIsLoading] = useState(false);
   
@@ -89,16 +88,17 @@ export default function OperatorOnboarding() {
     setIsLoading(true);
     
     try {
-      const profile: OperatorProfile = {
+      // In a real app, save this to the backend
+      const profile = {
         userId: user.id,
         fullName: formData.fullName,
         phone: formData.phone,
         nationalId: formData.nationalId,
         inviteCode: formData.inviteCode || undefined,
+        kycCompleted: true
       };
 
-      updateProfile(profile);
-      completeOnboarding();
+      localStorage.setItem('operatorProfile', JSON.stringify(profile));
       
       toast.success('Profile completed! Awaiting admin approval.');
       navigate('/pending-approval');

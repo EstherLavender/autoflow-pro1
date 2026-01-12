@@ -117,7 +117,8 @@ export default function AdminOnboarding() {
     setIsLoading(true);
     
     try {
-      const profile: AdminProfile = {
+      // In a real app, save this to the backend
+      const profile = {
         userId: user.id,
         fullName: formData.fullName,
         phone: formData.phone,
@@ -128,10 +129,10 @@ export default function AdminOnboarding() {
           ...cw,
           id: `cw-${Date.now()}-${i}`,
         })),
+        kycCompleted: true
       };
 
-      updateProfile(profile);
-      completeOnboarding();
+      localStorage.setItem('adminProfile', JSON.stringify(profile));
       
       toast.success('Profile completed! Awaiting approval.');
       navigate('/pending-approval');
