@@ -7,7 +7,7 @@ import { useEffect } from 'react';
 
 export default function PendingApprovalPage() {
   const navigate = useNavigate();
-  const { user, logout, refreshUser } = useAuth();
+  const { user, signOut, refreshUser } = useAuth();
 
   // Check approval status periodically
   useEffect(() => {
@@ -20,18 +20,18 @@ export default function PendingApprovalPage() {
 
   // Redirect if approved
   useEffect(() => {
-    if (user?.status === 'active' && user?.onboardingStatus === 'complete') {
+    if (user?.status === 'active') {
       const routes = {
         admin: '/admin',
-        operator: '/operator',
+        detailer: '/operator',
         customer: '/customer',
       };
-      navigate(routes[user.role], { replace: true });
+      navigate(routes[user.role] || '/customer', { replace: true });
     }
   }, [user, navigate]);
 
-  const handleLogout = () => {
-    logout();
+  const handleLogout = async () => {
+    await signOut();
     navigate('/login');
   };
 
@@ -39,7 +39,7 @@ export default function PendingApprovalPage() {
     switch (user?.role) {
       case 'admin':
         return 'Your car wash owner account is under review. Our team will verify your details and activate your account within 24-48 hours.';
-      case 'operator':
+      case 'detailer':
         return 'Your detailer account is awaiting approval from a car wash owner. They will review your profile and grant you access.';
       default:
         return 'Your account is pending approval.';
@@ -63,10 +63,10 @@ export default function PendingApprovalPage() {
           <CardContent className="space-y-4">
             <div className="bg-muted/50 p-4 rounded-lg">
               <p className="text-sm text-muted-foreground">
-                <strong>Account:</strong> {user?.email || user?.phone}
+                <strong>Account:</strong> {user?.email}
               </p>
               <p className="text-sm text-muted-foreground">
-                <strong>Role:</strong> {user?.role === 'admin' ? 'Car Wash Owner' : user?.role === 'operator' ? 'Detailer' : 'Customer'}
+                <strong>Role:</strong> {user?.role === 'admin' ? 'Car Wash Owner' : user?.role === 'detailer' ? 'Detailer' : 'Customer'}
               </p>
             </div>
 
@@ -91,7 +91,7 @@ export default function PendingApprovalPage() {
             </div>
 
             <p className="text-xs text-muted-foreground">
-              Need help? Contact us at support@trackwash.co.ke
+              Need help? Contact us at support@autoflow.com
             </p>
           </CardContent>
         </Card>

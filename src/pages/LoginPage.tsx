@@ -6,25 +6,26 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/com
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useAuth } from '@/context/AuthContext';
-import { UserRole } from '@/types/auth';
 import { toast } from 'sonner';
 
 type AuthMode = 'login' | 'signup';
+type UserRole = 'customer' | 'detailer' | 'admin';
 
 const roles: { id: UserRole; label: string; description: string; icon: React.ElementType }[] = [
   { id: 'customer', label: 'Car Owner', description: 'Book a wash & earn rewards', icon: User },
-  { id: 'operator', label: 'Detailer', description: 'Manage your jobs & tips', icon: Wrench },
+  { id: 'detailer', label: 'Detailer', description: 'Manage your jobs & tips', icon: Wrench },
   { id: 'admin', label: 'Car Wash Owner', description: 'Run your business', icon: Shield },
 ];
 
 export default function LoginPage() {
   const navigate = useNavigate();
-  const { login, signup } = useAuth();
+  const { signIn, signUp } = useAuth();
   const [mode, setMode] = useState<AuthMode>('login');
   const [selectedRole, setSelectedRole] = useState<UserRole>('customer');
   const [isLoading, setIsLoading] = useState(false);
   const [formData, setFormData] = useState({
     email: '',
+    password: '',
     phone: '',
     name: '',
   });
@@ -36,61 +37,37 @@ export default function LoginPage() {
     try {
       if (mode === 'signup') {
         // Validate signup fields
-        if (!formData.phone) {
-          toast.error('Phone number is required');
-          setIsLoading(false);
-          return;
-        }
-        if (selectedRole === 'customer' && !formData.email) {
-          toast.error('Email is required for customers');
+        if (!formData.email || !formData.password || !formData.name) {
+          toast.error('Please fill in all fields');
           setIsLoading(false);
           return;
         }
 
-        const user = await signup({
-          role: selectedRole,
-          email: formData.email || undefined,
-          phone: formData.phone,
-          name: formData.name,
-        });
-
-        toast.success('Account created! Complete your profile to continue.');
-        navigate('/onboarding');
+        await signUp(formData.email, formData.password, selectedRole, formData.name, formData.phone);
+        
+        if (selectedRole === 'customer') {
+          toast.success('Account created! Welcome to AutoFlow Pro 🎉');
+          navigate('/customer');
+        } else {
+          toast.success('Account created! Awaiting admin approval.');
+          navigate('/pending-approval');
+        }
       } else {
         // Login
-        const identifier = formData.email || formData.phone;
-        if (!identifier) {
-          toast.error('Please enter your email or phone number');
+        if (!formData.email || !formData.password) {
+          toast.error('Please enter your email and password');
           setIsLoading(false);
           return;
         }
 
-        const user = await login(identifier);
-
+        await signIn(formData.email, formData.password);
         toast.success('Welcome back!');
-
-        // Check if onboarding is complete
-        if (user.onboardingStatus === 'incomplete') {
-          navigate('/onboarding');
-          return;
-        }
-
-        // Check if pending approval
-        if (user.status === 'pending') {
-          navigate('/pending-approval');
-          return;
-        }
-
-        // Navigate to role-specific dashboard
-        const routes: Record<UserRole, string> = {
-          admin: '/admin',
-          operator: '/operator',
-          customer: '/customer',
-        };
-        navigate(routes[user.role]);
+        
+        // Navigation is handled by the router based on user role
       }
-    } catch (error) {
-      toast.error(error instanceof Error ? error.message : 'Something went wrong');
+    } catch (error: any) {
+      const errorMessage = error.response?.data?.error || error.message || 'Something went wrong';
+      toast.error(errorMessage);
     } finally {
       setIsLoading(false);
     }
@@ -165,40 +142,56 @@ export default function LoginPage() {
                       placeholder="John Kamau"
                       value={formData.name}
                       onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                      required
                     />
                   </div>
                 )}
                 
                 <div className="space-y-2">
-                  <Label htmlFor="email">Email {mode === 'login' && '(or Phone)'}</Label>
+                  <Label htmlFor="email">Email</Label>
                   <Input
                     id="email"
                     type="email"
                     placeholder="you@example.com"
                     value={formData.email}
                     onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                    required
                   />
                 </div>
                 
                 <div className="space-y-2">
-                  <Label htmlFor="phone">Phone Number (M-Pesa)</Label>
+                  <Label htmlFor="password">Password</Label>
                   <Input
-                    id="phone"
-                    type="tel"
-                    placeholder="+254 712 345 678"
-                    value={formData.phone}
-                    onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
+                    id="password"
+                    type="password"
+                    placeholder={mode === 'login' ? 'Enter your password' : 'Choose a password (min 6 characters)'}
+                    value={formData.password}
+                    onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+                    minLength={6}
+                    required
                   />
                 </div>
+                
+                {mode === 'signup' && (
+                  <div className="space-y-2">
+                    <Label htmlFor="phone">Phone Number (Optional)</Label>
+                    <Input
+                      id="phone"
+                      type="tel"
+                      placeholder="+254 712 345 678"
+                      value={formData.phone}
+                      onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
+                    />
+                  </div>
+                )}
               </div>
 
               {/* Demo accounts hint */}
               {mode === 'login' && (
                 <div className="bg-muted/50 p-3 rounded-lg text-xs text-muted-foreground">
-                  <p className="font-medium mb-1">Demo accounts:</p>
-                  <p>Admin: admin@trackwash.co.ke</p>
-                  <p>Operator: operator@trackwash.co.ke</p>
-                  <p>Customer: customer@trackwash.co.ke</p>
+                  <p className="font-medium mb-1">Demo account:</p>
+                  <p>👑 Admin: admin@autoflow.com</p>
+                  <p>🔑 Password: admin123</p>
                 </div>
               )}
 
