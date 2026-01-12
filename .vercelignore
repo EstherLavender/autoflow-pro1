@@ -1,0 +1,58 @@
+# .vercelignore - Files to exclude from deployment
+
+# Dependencies
+node_modules/
+npm-debug.log
+yarn-error.log
+.pnpm-debug.log
+
+# Environment files
+.env
+.env.local
+.env.development
+.env.production
+.env.*.local
+
+# Development files
+.vscode/
+.idea/
+*.log
+*.cache
+
+# Build artifacts (will be built on Vercel)
+dist/
+build/
+.next/
+
+# Database files
+*.sqlite
+*.db
+
+# OS files
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Testing
+coverage/
+.nyc_output/
+test-results/
+
+# Temporary files
+tmp/
+temp/
+*.tmp
+
+# Documentation (optional - include if you want)
+# docs/
+# *.md
+
+# Git
+.git/
+.gitignore
+
+# Local uploads (use cloud storage in production)
+uploads/
+
+# Scripts
+scripts/
