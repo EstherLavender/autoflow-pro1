@@ -7,6 +7,7 @@ import LandingPage from './pages/LandingPage'
 import LoginPage from './pages/LoginPage'
 import NotFound from './pages/NotFound'
 import PendingApprovalPage from './pages/PendingApprovalPage'
+import OnboardingRouter from './pages/onboarding/OnboardingRouter'
 
 // Role-specific layouts
 import AdminLayout from './components/layout/AdminLayout'
@@ -22,6 +23,7 @@ function App() {
           <Route path="/" element={<LandingPage />} />
           <Route path="/login" element={<LoginPage />} />
           <Route path="/pending-approval" element={<PendingApprovalPage />} />
+          <Route path="/onboarding" element={<OnboardingRouter />} />
 
           {/* Protected routes */}
           <Route

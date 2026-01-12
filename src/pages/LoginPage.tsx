@@ -46,11 +46,14 @@ export default function LoginPage() {
         await signUp(formData.email, formData.password, selectedRole, formData.name, formData.phone);
         
         if (selectedRole === 'customer') {
-          toast.success('Account created! Welcome to AutoFlow Pro 🎉');
-          navigate('/customer');
+          toast.success('Account created! Let\'s get you started.');
+          navigate('/onboarding');
+        } else if (selectedRole === 'detailer') {
+          toast.success('Account created! Complete your profile to get started.');
+          navigate('/onboarding');
         } else {
-          toast.success('Account created! Awaiting admin approval.');
-          navigate('/pending-approval');
+          toast.success('Account created! Set up your business profile.');
+          navigate('/onboarding');
         }
       } else {
         // Login
