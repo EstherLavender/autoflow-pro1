@@ -12,7 +12,7 @@ import PhoneVerification from '@/components/kyc/PhoneVerification';
 
 export default function CustomerOnboarding() {
   const navigate = useNavigate();
-  const { user, updateProfile, completeOnboarding } = useAuth();
+  const { user } = useAuth();
   const [step, setStep] = useState(1);
   const [isLoading, setIsLoading] = useState(false);
   
@@ -22,7 +22,7 @@ export default function CustomerOnboarding() {
     email: user?.email || '',
   });
 
-  const [vehicle, setVehicle] = useState<Omit<CustomerVehicle, 'id'>>({
+  const [vehicle, setVehicle] = useState({
     numberPlate: '',
     carModel: '',
     color: '',

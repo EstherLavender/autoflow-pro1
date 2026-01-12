@@ -6,14 +6,13 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/com
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useAuth } from '@/context/AuthContext';
-import { AdminProfile, CarWashBusiness } from '@/types/auth';
 import { toast } from 'sonner';
 import KYCDocumentUpload from '@/components/kyc/KYCDocumentUpload';
 import PhoneVerification from '@/components/kyc/PhoneVerification';
 
 export default function AdminOnboarding() {
   const navigate = useNavigate();
-  const { user, updateProfile, completeOnboarding } = useAuth();
+  const { user } = useAuth();
   const [step, setStep] = useState(1);
   const [isLoading, setIsLoading] = useState(false);
   
