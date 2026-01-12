@@ -5,9 +5,10 @@ import {
   LogOut,
   Menu,
   X,
-  Gift,
   Home,
-  MapPin
+  CalendarPlus,
+  History,
+  User
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/context/AuthContext';
@@ -22,9 +23,9 @@ interface NavItem {
 
 const navItems: NavItem[] = [
   { label: 'Home', icon: Home, href: '/customer' },
-  { label: 'Book Wash', icon: Droplets, href: '/customer/book' },
-  { label: 'Car Washes', icon: MapPin, href: '/customer/garages' },
-  { label: 'Rewards', icon: Gift, href: '/customer/rewards' },
+  { label: 'Book Service', icon: CalendarPlus, href: '/customer/book' },
+  { label: 'History', icon: History, href: '/customer/history' },
+  { label: 'Profile', icon: User, href: '/customer/profile' },
 ];
 
 interface CustomerLayoutProps {
@@ -54,7 +55,7 @@ export default function CustomerLayout({ children, title, subtitle }: CustomerLa
               <Droplets className="h-5 w-5 text-primary-foreground" />
             </div>
             <div>
-              <span className="font-bold text-sm">TRACK WASH</span>
+              <span className="font-bold text-sm text-foreground">TRACK WASH</span>
               <p className="text-xs text-muted-foreground">Welcome back!</p>
             </div>
           </div>
@@ -65,14 +66,14 @@ export default function CustomerLayout({ children, title, subtitle }: CustomerLa
             </Button>
 
             <div className="hidden md:flex items-center gap-3">
-              <span className="text-sm font-medium">{user?.email || user?.phone}</span>
+              <span className="text-sm font-medium text-foreground">{user?.email || user?.phone}</span>
               <Button variant="ghost" size="icon" onClick={handleLogout}>
                 <LogOut className="h-4 w-4" />
               </Button>
             </div>
 
-            <div className="md:hidden h-8 w-8 rounded-full bg-accent flex items-center justify-center">
-              <span className="text-xs font-semibold text-accent-foreground">
+            <div className="md:hidden h-8 w-8 rounded-full bg-muted flex items-center justify-center">
+              <span className="text-xs font-semibold text-foreground">
                 {user?.email?.charAt(0).toUpperCase() || 'C'}
               </span>
             </div>
@@ -81,7 +82,7 @@ export default function CustomerLayout({ children, title, subtitle }: CustomerLa
 
         {/* Mobile Dropdown Menu */}
         {menuOpen && (
-          <div className="md:hidden border-t border-border p-3 space-y-1 animate-slide-up">
+          <div className="md:hidden border-t border-border p-3 space-y-1 animate-slide-up bg-card">
             {navItems.map((item) => {
               const isActive = location.pathname === item.href;
               return (
@@ -113,7 +114,7 @@ export default function CustomerLayout({ children, title, subtitle }: CustomerLa
       </header>
 
       {/* Desktop Navigation */}
-      <nav className="hidden md:block sticky top-[57px] z-40 bg-card/80 backdrop-blur-sm border-b border-border">
+      <nav className="hidden md:block sticky top-[57px] z-40 bg-card border-b border-border">
         <div className="container flex items-center gap-1 py-2 overflow-x-auto">
           {navItems.map((item) => {
             const isActive = location.pathname === item.href;
@@ -140,7 +141,7 @@ export default function CustomerLayout({ children, title, subtitle }: CustomerLa
       <main className="container py-6">
         {/* Page Header */}
         <div className="mb-6">
-          <h1 className="text-2xl font-bold">{title}</h1>
+          <h1 className="text-2xl font-bold text-foreground">{title}</h1>
           {subtitle && <p className="text-muted-foreground mt-1">{subtitle}</p>}
         </div>
 
@@ -158,7 +159,7 @@ export default function CustomerLayout({ children, title, subtitle }: CustomerLa
                 key={item.href}
                 to={item.href}
                 className={cn(
-                  "flex flex-col items-center gap-1 px-3 py-1.5 rounded-lg transition-all",
+                  "flex flex-col items-center gap-1 px-3 py-1.5 rounded-lg transition-all min-w-[60px]",
                   isActive 
                     ? "text-primary"
                     : "text-muted-foreground"

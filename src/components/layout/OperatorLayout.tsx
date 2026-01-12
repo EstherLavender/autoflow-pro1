@@ -1,13 +1,13 @@
 import { ReactNode } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { 
-  LayoutDashboard, 
   Car,
   LogOut,
   Menu,
   X,
   ClipboardList,
-  History
+  Wallet,
+  User
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/context/AuthContext';
@@ -16,13 +16,14 @@ import { cn } from '@/lib/utils';
 
 interface NavItem {
   label: string;
-  icon: typeof LayoutDashboard;
+  icon: typeof ClipboardList;
   href: string;
 }
 
 const navItems: NavItem[] = [
-  { label: 'My Jobs', icon: ClipboardList, href: '/operator' },
-  { label: 'Completed', icon: History, href: '/operator/completed' },
+  { label: 'Jobs', icon: ClipboardList, href: '/operator' },
+  { label: 'Earnings', icon: Wallet, href: '/operator/earnings' },
+  { label: 'Profile', icon: User, href: '/operator/profile' },
 ];
 
 interface OperatorLayoutProps {
@@ -52,7 +53,7 @@ export default function OperatorLayout({ children, title, subtitle }: OperatorLa
               <Car className="h-5 w-5 text-primary-foreground" />
             </div>
             <div>
-              <span className="font-bold text-sm">TRACK WASH</span>
+              <span className="font-bold text-sm text-foreground">TRACK WASH</span>
               <p className="text-xs text-muted-foreground">Detailer</p>
             </div>
           </div>
@@ -79,12 +80,12 @@ export default function OperatorLayout({ children, title, subtitle }: OperatorLa
               })}
             </div>
 
-            <Button variant="ghost" size="icon-sm" className="sm:hidden" onClick={() => setMenuOpen(!menuOpen)}>
+            <Button variant="ghost" size="icon" className="sm:hidden" onClick={() => setMenuOpen(!menuOpen)}>
               {menuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
             </Button>
 
-            <div className="h-8 w-8 rounded-full bg-accent flex items-center justify-center ml-2">
-              <span className="text-xs font-semibold text-accent-foreground">
+            <div className="h-8 w-8 rounded-full bg-muted flex items-center justify-center ml-2">
+              <span className="text-xs font-semibold text-foreground">
                 {user?.email?.charAt(0).toUpperCase() || 'O'}
               </span>
             </div>
@@ -93,7 +94,7 @@ export default function OperatorLayout({ children, title, subtitle }: OperatorLa
 
         {/* Mobile Menu */}
         {menuOpen && (
-          <div className="sm:hidden border-t border-border p-3 space-y-1 animate-slide-up">
+          <div className="sm:hidden border-t border-border p-3 space-y-1 animate-slide-up bg-card">
             {navItems.map((item) => {
               const isActive = location.pathname === item.href;
               return (
@@ -128,7 +129,7 @@ export default function OperatorLayout({ children, title, subtitle }: OperatorLa
       <main className="container py-6">
         {/* Page Header */}
         <div className="mb-6">
-          <h1 className="text-2xl font-bold">{title}</h1>
+          <h1 className="text-2xl font-bold text-foreground">{title}</h1>
           {subtitle && <p className="text-muted-foreground mt-1">{subtitle}</p>}
         </div>
 

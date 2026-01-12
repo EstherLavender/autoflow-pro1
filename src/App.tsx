@@ -19,6 +19,9 @@ import InventoryPage from "./pages/admin/InventoryPage";
 import PaymentsPage from "./pages/admin/PaymentsPage";
 import LoyaltyPage from "./pages/admin/LoyaltyPage";
 import ApprovalsPage from "./pages/admin/ApprovalsPage";
+import UsersPage from "./pages/admin/UsersPage";
+import DisputesPage from "./pages/admin/DisputesPage";
+import SettingsPage from "./pages/admin/SettingsPage";
 
 // Operator Pages
 import OperatorDashboard from "./pages/operator/OperatorDashboard";
@@ -111,19 +114,19 @@ function AppRoutes() {
           <ApprovalsPage />
         </ProtectedRoute>
       } />
-      <Route path="/admin/staff" element={
+      <Route path="/admin/users" element={
         <ProtectedRoute allowedRoles={['admin']}>
-          <AdminDashboard />
+          <UsersPage />
         </ProtectedRoute>
       } />
-      <Route path="/admin/analytics" element={
+      <Route path="/admin/disputes" element={
         <ProtectedRoute allowedRoles={['admin']}>
-          <AdminDashboard />
+          <DisputesPage />
         </ProtectedRoute>
       } />
       <Route path="/admin/settings" element={
         <ProtectedRoute allowedRoles={['admin']}>
-          <AdminDashboard />
+          <SettingsPage />
         </ProtectedRoute>
       } />
       
