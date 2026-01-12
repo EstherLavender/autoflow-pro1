@@ -5,9 +5,9 @@ import OperatorOnboarding from './OperatorOnboarding';
 import CustomerOnboarding from './CustomerOnboarding';
 
 export default function OnboardingRouter() {
-  const { user, isLoading } = useAuth();
+  const { user, loading } = useAuth();
 
-  if (isLoading) {
+  if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="animate-spin h-8 w-8 border-2 border-primary border-t-transparent rounded-full" />
@@ -19,25 +19,11 @@ export default function OnboardingRouter() {
     return <Navigate to="/login" replace />;
   }
 
-  // If onboarding is already complete, redirect to appropriate page
-  if (user.onboardingStatus === 'complete') {
-    if (user.status === 'pending') {
-      return <Navigate to="/pending-approval" replace />;
-    }
-    
-    const routes = {
-      admin: '/admin',
-      operator: '/operator',
-      customer: '/customer',
-    };
-    return <Navigate to={routes[user.role]} replace />;
-  }
-
   // Show role-specific onboarding
   switch (user.role) {
     case 'admin':
       return <AdminOnboarding />;
-    case 'operator':
+    case 'detailer':
       return <OperatorOnboarding />;
     case 'customer':
       return <CustomerOnboarding />;
