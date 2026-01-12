@@ -1,21 +1,52 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Home, Building, ArrowRight } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import CustomerLayout from '@/components/layout/CustomerLayout';
+import { EmptyState, LoadingState } from '@/components/ui/empty-state';
 import MobileProviderCard from '@/components/mobile/MobileProviderCard';
-import { mockServiceTypes, getAvailableMobileProviders, getNearbyGarages } from '@/data/mockData';
+import { supabase } from '@/lib/Supabase';
 import { useNavigate } from 'react-router-dom';
+import { toast } from 'sonner';
 
 type WashOption = 'mobile' | 'physical';
 
 export default function WashPage() {
   const navigate = useNavigate();
   const [washOption, setWashOption] = useState<WashOption | null>(null);
+  const [mobileProviders, setMobileProviders] = useState<any[]>([]);
+  const [garagesCount, setGaragesCount] = useState(0);
+  const [isLoading, setIsLoading] = useState(true);
   
-  const washServices = mockServiceTypes.filter(s => s.category === 'wash');
-  const mobileProviders = getAvailableMobileProviders();
-  const carWashGarages = getNearbyGarages({ serviceId: '1' });
+  useEffect(() => {
+    fetchData();
+  }, []);
+
+  const fetchData = async () => {
+    try {
+      const [providersRes, garagesRes] = await Promise.all([
+        supabase.from('mobile_providers').select('*').eq('is_available', true),
+        supabase.from('garages').select('id', { count: 'exact', head: true })
+      ]);
+      
+      if (providersRes.error) throw providersRes.error;
+      setMobileProviders(providersRes.data || []);
+      setGaragesCount(garagesRes.count || 0);
+    } catch (error) {
+      console.error('Error fetching data:', error);
+      toast.error('Failed to load wash options');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  if (isLoading) {
+    return (
+      <CustomerLayout title="Wash My Car" subtitle="Choose how you want your car cleaned">
+        <LoadingState message="Loading options..." />
+      </CustomerLayout>
+    );
+  }
 
   return (
     <CustomerLayout title="Wash My Car" subtitle="Choose how you want your car cleaned">
@@ -42,7 +73,7 @@ export default function WashPage() {
                 <div className="flex-1">
                   <h3 className="font-semibold text-lg mb-1">Car Wash Location</h3>
                   <p className="text-sm text-muted-foreground mb-3">Drive to a nearby car wash for quick service.</p>
-                  <span className="text-accent font-medium">{carWashGarages.length} locations nearby</span>
+                  <span className="text-accent font-medium">{garagesCount} locations nearby</span>
                 </div>
                 <ArrowRight className="h-5 w-5 text-muted-foreground" />
               </div>

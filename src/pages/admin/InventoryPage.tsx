@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Plus, AlertTriangle, Search, Package } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -6,18 +6,50 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Progress } from '@/components/ui/progress';
 import AdminLayout from '@/components/layout/AdminLayout';
-import { mockInventory } from '@/data/mockData';
+import { EmptyState, LoadingState } from '@/components/ui/empty-state';
+import { supabase } from '@/lib/Supabase';
+import { toast } from 'sonner';
 
 export default function InventoryPage() {
   const [searchQuery, setSearchQuery] = useState('');
-  const [items] = useState(mockInventory);
+  const [items, setItems] = useState<any[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    fetchInventory();
+  }, []);
+
+  const fetchInventory = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('inventory')
+        .select('*')
+        .order('name');
+      
+      if (error) throw error;
+      setItems(data || []);
+    } catch (error) {
+      console.error('Error fetching inventory:', error);
+      toast.error('Failed to load inventory');
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   const filteredItems = items.filter(item => 
     item.name.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
-  const lowStockCount = items.filter(i => i.quantity <= i.minStockLevel).length;
-  const totalValue = items.reduce((sum, i) => sum + (i.quantity * i.costPerUnit), 0);
+  const lowStockCount = items.filter(i => i.quantity <= i.min_stock_level).length;
+  const totalValue = items.reduce((sum, i) => sum + (i.quantity * i.cost_per_unit), 0);
+
+  if (isLoading) {
+    return (
+      <AdminLayout title="Inventory" subtitle="Track parts and consumables">
+        <LoadingState message="Loading inventory..." />
+      </AdminLayout>
+    );
+  }
 
   return (
     <AdminLayout title="Inventory" subtitle="Track parts and consumables">
@@ -63,7 +95,7 @@ export default function InventoryPage() {
             </thead>
             <tbody>
               {filteredItems.map((item) => {
-                const isLow = item.quantity <= item.minStockLevel;
+                const isLow = item.quantity <= item.min_stock_level;
                 return (
                   <tr key={item.id} className="border-b border-border hover:bg-muted/50">
                     <td className="p-4">
@@ -75,7 +107,7 @@ export default function InventoryPage() {
                       </div>
                     </td>
                     <td className="p-4">{item.quantity} {item.unit}</td>
-                    <td className="p-4">KES {item.costPerUnit.toLocaleString()}</td>
+                    <td className="p-4">KES {item.cost_per_unit.toLocaleString()}</td>
                     <td className="p-4">
                       {isLow ? <Badge variant="warning"><AlertTriangle className="h-3 w-3 mr-1" />Low</Badge> : <Badge variant="success">OK</Badge>}
                     </td>

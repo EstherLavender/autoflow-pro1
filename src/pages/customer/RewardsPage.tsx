@@ -1,22 +1,57 @@
+import { useState, useEffect } from 'react';
 import { Gift, Sparkles, Award, Star, TrendingUp, CheckCircle } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
 import CustomerLayout from '@/components/layout/CustomerLayout';
-import { mockLoyalty, mockLoyaltyConfig, mockJobs, mockServiceTypes } from '@/data/mockData';
+import { EmptyState, LoadingState } from '@/components/ui/empty-state';
+import { useAuth } from '@/context/AuthContext';
+import { supabase } from '@/lib/Supabase';
 import { toast } from 'sonner';
 
 export default function RewardsPage() {
-  const customerId = '3';
-  const loyalty = mockLoyalty.find(l => l.customerId === customerId);
-  const config = mockLoyaltyConfig;
+  const { user } = useAuth();
+  const [loyalty, setLoyalty] = useState<any>(null);
+  const [config, setConfig] = useState({ enabled: true, visitsForFreeWash: 10, freeServiceType: 'Basic Wash' });
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    fetchLoyaltyData();
+  }, [user]);
+
+  const fetchLoyaltyData = async () => {
+    if (!user) return;
+    try {
+      const { data, error } = await supabase
+        .from('loyalty_accounts')
+        .select('*')
+        .eq('customer_id', user.id)
+        .single();
+      
+      if (error && error.code !== 'PGRST116') throw error;
+      setLoyalty(data);
+    } catch (error) {
+      console.error('Error fetching loyalty data:', error);
+      toast.error('Failed to load rewards');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+  
+  if (isLoading) {
+    return (
+      <CustomerLayout title="Rewards" subtitle="Earn free washes with every visit">
+        <LoadingState message="Loading rewards..." />
+      </CustomerLayout>
+    );
+  }
   
   const visitsToReward = config.visitsForFreeWash;
   const currentVisits = loyalty?.visits || 0;
   const progress = ((currentVisits % visitsToReward) / visitsToReward) * 100;
   const visitsRemaining = visitsToReward - (currentVisits % visitsToReward);
-  const rewardReady = loyalty && loyalty.freeWashesEarned > loyalty.freeWashesRedeemed;
+  const rewardReady = loyalty && loyalty.free_washes_earned > loyalty.free_washes_redeemed;
 
   const customerJobs = mockJobs.filter(j => j.customerId === customerId && j.status === 'completed');
 
@@ -52,8 +87,8 @@ export default function RewardsPage() {
 
       <div className="grid grid-cols-3 gap-4 mb-6">
         <Card><CardContent className="py-4 text-center"><TrendingUp className="h-5 w-5 text-primary mx-auto mb-2" /><p className="text-2xl font-bold">{currentVisits}</p><p className="text-xs text-muted-foreground">Visits</p></CardContent></Card>
-        <Card><CardContent className="py-4 text-center"><Award className="h-5 w-5 text-accent mx-auto mb-2" /><p className="text-2xl font-bold">{loyalty?.freeWashesEarned || 0}</p><p className="text-xs text-muted-foreground">Earned</p></CardContent></Card>
-        <Card><CardContent className="py-4 text-center"><CheckCircle className="h-5 w-5 text-success mx-auto mb-2" /><p className="text-2xl font-bold">{loyalty?.freeWashesRedeemed || 0}</p><p className="text-xs text-muted-foreground">Redeemed</p></CardContent></Card>
+        <Card><CardContent className="py-4 text-center"><Award className="h-5 w-5 text-accent mx-auto mb-2" /><p className="text-2xl font-bold">{loyalty?.free_washes_earned || 0}</p><p className="text-xs text-muted-foreground">Earned</p></CardContent></Card>
+        <Card><CardContent className="py-4 text-center"><CheckCircle className="h-5 w-5 text-success mx-auto mb-2" /><p className="text-2xl font-bold">{loyalty?.free_washes_redeemed || 0}</p><p className="text-xs text-muted-foreground">Redeemed</p></CardContent></Card>
       </div>
 
       <Card variant="elevated">

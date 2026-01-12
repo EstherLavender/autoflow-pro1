@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Car, Droplets, Wrench, Settings, Package, Check, Smartphone } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -6,7 +6,9 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import CustomerLayout from '@/components/layout/CustomerLayout';
-import { mockServiceTypes, mockVehicles } from '@/data/mockData';
+import { EmptyState, LoadingState } from '@/components/ui/empty-state';
+import { useAuth } from '@/context/AuthContext';
+import { supabase } from '@/lib/Supabase';
 import { toast } from 'sonner';
 
 const categoryIcons = {
@@ -19,13 +21,38 @@ const categoryIcons = {
 type BookingStep = 'vehicle' | 'service' | 'payment' | 'confirm';
 
 export default function BookServicePage() {
+  const { user } = useAuth();
   const [step, setStep] = useState<BookingStep>('vehicle');
   const [selectedVehicle, setSelectedVehicle] = useState<string | null>(null);
   const [selectedService, setSelectedService] = useState<string | null>(null);
   const [phone, setPhone] = useState('');
+  const [vehicles, setVehicles] = useState<any[]>([]);
+  const [services, setServices] = useState<any[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
 
-  const vehicles = mockVehicles.filter(v => v.customerId === '3');
-  const services = mockServiceTypes;
+  useEffect(() => {
+    fetchData();
+  }, [user]);
+
+  const fetchData = async () => {
+    try {
+      const [vehiclesRes, servicesRes] = await Promise.all([
+        supabase.from('vehicles').select('*').eq('customer_id', user?.id),
+        supabase.from('services').select('*').order('name')
+      ]);
+      
+      if (vehiclesRes.error) throw vehiclesRes.error;
+      if (servicesRes.error) throw servicesRes.error;
+      
+      setVehicles(vehiclesRes.data || []);
+      setServices(servicesRes.data || []);
+    } catch (error) {
+      console.error('Error fetching data:', error);
+      toast.error('Failed to load booking data');
+    } finally {
+      setIsLoading(false);
+    }
+  };
   
   const vehicle = vehicles.find(v => v.id === selectedVehicle);
   const service = services.find(s => s.id === selectedService);
@@ -41,6 +68,14 @@ export default function BookServicePage() {
     setSelectedService(null);
     setPhone('');
   };
+
+  if (isLoading) {
+    return (
+      <CustomerLayout title="Book a Service" subtitle="Schedule your next car wash">
+        <LoadingState message="Loading..." />
+      </CustomerLayout>
+    );
+  }
 
   return (
     <CustomerLayout title="Book a Service" subtitle="Schedule your next car wash">

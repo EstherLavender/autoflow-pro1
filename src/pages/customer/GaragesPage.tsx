@@ -1,9 +1,10 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { MapPin, Filter } from 'lucide-react';
 import CustomerLayout from '@/components/layout/CustomerLayout';
 import GarageCard from '@/components/garages/GarageCard';
 import GarageFilters from '@/components/garages/GarageFilters';
-import { getNearbyGarages } from '@/data/mockData';
+import { EmptyState, LoadingState } from '@/components/ui/empty-state';
+import { supabase } from '@/lib/Supabase';
 import { Garage } from '@/types';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
@@ -11,8 +12,31 @@ import { toast } from 'sonner';
 export default function GaragesPage() {
   const navigate = useNavigate();
   const [filters, setFilters] = useState<{ openNow: boolean; emergencyOnly: boolean; serviceId?: string }>({ openNow: false, emergencyOnly: false });
-  
-  const garages = getNearbyGarages(filters);
+  const [garages, setGarages] = useState<Garage[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    fetchGarages();
+  }, [filters]);
+
+  const fetchGarages = async () => {
+    try {
+      let query = supabase.from('garages').select('*');
+      
+      if (filters.openNow) {
+        query = query.eq('is_open', true);
+      }
+      
+      const { data, error } = await query.order('distance');
+      if (error) throw error;
+      setGarages(data || []);
+    } catch (error) {
+      console.error('Error fetching garages:', error);
+      toast.error('Failed to load garages');
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   const handleSelectGarage = (garage: Garage) => {
     navigate(`/customer/book?garageId=${garage.id}`);
@@ -21,6 +45,14 @@ export default function GaragesPage() {
   const handleCallGarage = (garage: Garage) => {
     toast.info(`Calling ${garage.name}...`);
   };
+
+  if (isLoading) {
+    return (
+      <CustomerLayout title="Find a Garage" subtitle="Nearby service centers">
+        <LoadingState message="Loading garages..." />
+      </CustomerLayout>
+    );
+  }
 
   return (
     <CustomerLayout title="Find a Garage" subtitle="Nearby service centers">
