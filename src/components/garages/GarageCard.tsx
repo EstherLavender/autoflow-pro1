@@ -3,7 +3,6 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Garage } from '@/types';
-import { mockServiceTypes } from '@/data/mockData';
 
 interface GarageCardProps {
   garage: Garage;
@@ -12,10 +11,8 @@ interface GarageCardProps {
 }
 
 export default function GarageCard({ garage, onSelect, onCall }: GarageCardProps) {
-  const availableServices = garage.services
-    .map(id => mockServiceTypes.find(s => s.id === id))
-    .filter(Boolean)
-    .slice(0, 3);
+  // Note: garage.services should contain service objects or names, not just IDs
+  const availableServices = garage.services?.slice(0, 3) || [];
 
   return (
     <Card variant="interactive" className="overflow-hidden" onClick={() => onSelect(garage)}>
@@ -55,15 +52,21 @@ export default function GarageCard({ garage, onSelect, onCall }: GarageCardProps
 
         {/* Services */}
         <div className="flex flex-wrap gap-1 mt-3">
-          {availableServices.map(service => (
-            <Badge key={service!.id} variant="outline" className="text-xs">
-              {service!.name}
-            </Badge>
-          ))}
-          {garage.services.length > 3 && (
-            <Badge variant="outline" className="text-xs">
-              +{garage.services.length - 3} more
-            </Badge>
+          {availableServices.length > 0 ? (
+            <>
+              {availableServices.map((service, idx) => (
+                <Badge key={idx} variant="outline" className="text-xs">
+                  {typeof service === 'string' ? service : service.name || 'Service'}
+                </Badge>
+              ))}
+              {(garage.services?.length || 0) > 3 && (
+                <Badge variant="outline" className="text-xs">
+                  +{(garage.services?.length || 0) - 3} more
+                </Badge>
+              )}
+            </>
+          ) : (
+            <Badge variant="outline" className="text-xs">Services available</Badge>
           )}
         </div>
 
