@@ -47,14 +47,13 @@ export default function LoginPage() {
         
         if (selectedRole === 'customer') {
           toast.success('Account created! Let\'s get you started.');
-          navigate('/onboarding');
         } else if (selectedRole === 'detailer') {
           toast.success('Account created! Complete your profile to get started.');
-          navigate('/onboarding');
         } else {
           toast.success('Account created! Set up your business profile.');
-          navigate('/onboarding');
         }
+        
+        navigate('/onboarding');
       } else {
         // Login
         if (!formData.email || !formData.password) {
