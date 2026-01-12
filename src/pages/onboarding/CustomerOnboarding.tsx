@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Car, User, ArrowRight, ArrowLeft, Loader2 } from 'lucide-react';
+import { Car, User, ArrowRight, ArrowLeft, Loader2, FileCheck, Phone } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -8,6 +8,8 @@ import { Label } from '@/components/ui/label';
 import { useAuth } from '@/context/AuthContext';
 import { CustomerProfile, CustomerVehicle } from '@/types/auth';
 import { toast } from 'sonner';
+import KYCDocumentUpload from '@/components/kyc/KYCDocumentUpload';
+import PhoneVerification from '@/components/kyc/PhoneVerification';
 
 export default function CustomerOnboarding() {
   const navigate = useNavigate();
@@ -27,7 +29,13 @@ export default function CustomerOnboarding() {
     color: '',
   });
 
-  const totalSteps = 2;
+  const [kycData, setKycData] = useState({
+    phoneVerified: false,
+    documentUploaded: false,
+    documentId: ''
+  });
+
+  const totalSteps = 4;
 
   const validateStep = (): boolean => {
     if (step === 1) {
@@ -37,6 +45,18 @@ export default function CustomerOnboarding() {
       }
     }
     if (step === 2) {
+      if (!kycData.phoneVerified) {
+        toast.error('Please verify your phone number');
+        return false;
+      }
+    }
+    if (step === 3) {
+      if (!kycData.documentUploaded) {
+        toast.error('Please upload your ID document');
+        return false;
+      }
+    }
+    if (step === 4) {
       if (!vehicle.numberPlate || !vehicle.carModel || !vehicle.color) {
         toast.error('Please fill in all vehicle details');
         return false;
@@ -106,17 +126,28 @@ export default function CustomerOnboarding() {
               <div className="h-12 w-12 rounded-xl bg-primary/10 flex items-center justify-center">
                 {step === 1 ? (
                   <User className="h-6 w-6 text-primary" />
+                ) : step === 2 ? (
+                  <Phone className="h-6 w-6 text-primary" />
+                ) : step === 3 ? (
+                  <FileCheck className="h-6 w-6 text-primary" />
                 ) : (
                   <Car className="h-6 w-6 text-primary" />
                 )}
               </div>
               <div>
                 <CardTitle>
-                  {step === 1 ? 'Your Details' : 'Add Your Vehicle'}
+                  {step === 1 ? 'Your Details' : 
+                   step === 2 ? 'Verify Phone' :
+                   step === 3 ? 'Upload ID' :
+                   'Add Your Vehicle'}
                 </CardTitle>
                 <CardDescription>
                   {step === 1 
                     ? "Let's get to know you"
+                    : step === 2 
+                    ? "Verify your phone number"
+                    : step === 3
+                    ? "Upload your ID for verification"
                     : "Tell us about your car"
                   }
                 </CardDescription>
@@ -156,8 +187,31 @@ export default function CustomerOnboarding() {
               </div>
             )}
 
-            {/* Step 2: Vehicle */}
+            {/* Step 2: Phone Verification */}
             {step === 2 && (
+              <div className="animate-fade-in">
+                <PhoneVerification 
+                  phone={formData.phone}
+                  onVerified={() => setKycData({ ...kycData, phoneVerified: true })}
+                />
+              </div>
+            )}
+
+            {/* Step 3: ID Upload */}
+            {step === 3 && (
+              <div className="animate-fade-in">
+                <KYCDocumentUpload
+                  documentType="national_id"
+                  title="National ID"
+                  description="Upload clear photos of your ID"
+                  requiresBackImage={true}
+                  onUploadComplete={(docId) => setKycData({ ...kycData, documentUploaded: true, documentId: docId })}
+                />
+              </div>
+            )}
+
+            {/* Step 4: Vehicle */}
+            {step === 4 && (
               <div className="space-y-4 animate-fade-in">
                 <div className="space-y-2">
                   <Label>Number Plate *</Label>
