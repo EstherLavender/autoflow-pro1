@@ -1,53 +1,237 @@
+# 🚗 AutoFlow Pro
 
-TRACKWASH — SYSTEM DESIGN & IMPLEMENTATION DOCUMENTATION
+A modern car wash management platform built with React, TypeScript, Express.js, and PostgreSQL.
 
-Version: 1.0
-Status: MVP → Production
-Audience: Engineers, Product, Payments, Ops
-Last Updated: Jan 2026
+## Features
 
-⸻
+### For Customers
+- 🚙 Book car wash services
+- 📸 Manage vehicles with photos
+- 🎯 Track bookings in real-time
+- 🏆 Earn loyalty points and rewards
+- 📧 Email and system notifications
 
-1. PRODUCT OVERVIEW
+### For Detailers
+- 📋 View assigned jobs
+- ✅ Update job status
+- 💰 Track earnings and tips
+- 📬 Receive job assignment notifications
 
-1.1 What is TrackWash?
+### For Admins (Car Wash Owners)
+- 👥 Approve/manage detailers
+- 🛠 Create and manage services
+- 📊 View all bookings and payments
+- 📦 Manage inventory
+- 💳 Track transactions
 
-TrackWash is a multi-role car wash management and payment platform enabling:
-	•	Car wash owners to manage branches, staff, revenue
-	•	Detailers to receive jobs & payouts
-	•	Customers to pay via M-Pesa or Crypto (Stablecoins)
-	•	Admins to approve, monitor, and settle payments
+## Tech Stack
 
-1.2 Core Value Proposition
-	•	Unified fiat + crypto payments
-	•	Instant settlement to M-Pesa Paybill
-	•	Transparent, auditable transactions
-	•	Mobile-first, QR-based payments (Tando-like UX)
+**Frontend:**
+- React 18 + TypeScript
+- Vite
+- TailwindCSS + shadcn/ui
+- React Router
+- Axios
+- Sonner (toast notifications)
 
-⸻
+**Backend:**
+- Node.js + Express.js
+- PostgreSQL (Neon)
+- JWT Authentication
+- Multer (file uploads)
+- Nodemailer (email notifications)
+- bcrypt (password hashing)
 
-2. USER ROLES & PERMISSIONS
+## Quick Start
 
-2.1 Roles
+### Prerequisites
+- Node.js 18+
+- Neon PostgreSQL account
 
-Role	Description
-Super Admin	Platform owner
-Car Wash Owner	Business admin
-Detailer	Service provider
-Customer	End user
+### Installation
 
-2.2 Permission Matrix
+1. **Clone the repository**
+```bash
+git clone https://github.com/Talent-Index/autoflow-pro.git
+cd autoflow-pro
+```
 
-Feature	Admin	Owner	Detailer	Customer
-View dashboard	✅	✅	✅	✅
-Receive payments	❌	✅	✅	❌
-Make payments	❌	❌	❌	✅
-Approvals	✅	❌	❌	❌
+2. **Install dependencies**
+```bash
+npm install
+```
 
+3. **Set up environment variables**
+```bash
+cp .env.example .env
+```
 
-⸻
+Edit `.env` and add:
+```env
+DATABASE_URL=your-neon-postgresql-url
+JWT_SECRET=your-secret-key
+SMTP_USER=your-email@gmail.com
+SMTP_PASS=your-app-password
+```
 
-3. SYSTEM ARCHITECTURE
+4. **Set up database**
+- Go to [Neon Console](https://console.neon.tech)
+- Run the SQL from `database/schema.sql`
+
+5. **Start development servers**
+```bash
+npm run dev:all
+```
+
+This starts:
+- Frontend: http://localhost:5173
+- Backend API: http://localhost:3001
+
+### Default Admin Login
+```
+Email: admin@autoflow.com
+Password: admin123
+```
+
+## Project Structure
+
+```
+autoflow-pro/
+├── server/              # Express.js API
+│   ├── config/         # Database, uploads, notifications
+│   ├── middleware/     # Auth middleware
+│   └── routes/         # API endpoints
+├── database/           # SQL schema
+├── uploads/            # User-uploaded files
+├── src/
+│   ├── components/    # React components
+│   ├── pages/         # Page components
+│   ├── lib/           # API client, utilities
+│   └── context/       # Auth context
+└── .env               # Environment variables
+```
+
+## API Documentation
+
+See [SETUP_GUIDE.md](./SETUP_GUIDE.md) for comprehensive API documentation.
+
+### Key Endpoints
+
+**Authentication**
+- `POST /api/auth/register` - Create account
+- `POST /api/auth/login` - Sign in
+- `GET /api/auth/me` - Get current user
+
+**Services**
+- `GET /api/services` - List services
+- `POST /api/services` - Create (admin)
+- `DELETE /api/services/:id` - Delete (admin)
+
+**Bookings**
+- `GET /api/bookings` - List bookings
+- `POST /api/bookings` - Create booking
+- `PATCH /api/bookings/:id/status` - Update status
+
+**File Uploads**
+- `POST /api/uploads/profile` - Upload profile picture
+- `POST /api/uploads/vehicle/:id` - Upload vehicle photo
+
+**Notifications**
+- `GET /api/notifications` - Get notifications
+- `PATCH /api/notifications/:id/read` - Mark as read
+
+## Development
+
+### Commands
+
+```bash
+# Frontend only
+npm run dev
+
+# Backend only
+npm run dev:server
+
+# Both (recommended)
+npm run dev:all
+
+# Build for production
+npm run build
+
+# Preview production build
+npm run preview
+```
+
+### Testing
+
+Build test:
+```bash
+npm run build
+```
+
+API health check:
+```bash
+curl http://localhost:3001/api/health
+```
+
+## Email Setup
+
+For email notifications, create a Gmail app password:
+
+1. Go to https://myaccount.google.com/apppasswords
+2. Create app password for "Mail"
+3. Add to `.env`:
+   ```env
+   SMTP_USER=your-email@gmail.com
+   SMTP_PASS=your-16-char-app-password
+   ```
+
+## Deployment
+
+### Frontend (Vercel/Netlify)
+1. Build command: `npm run build`
+2. Output directory: `dist`
+3. Set environment variables
+
+### Backend (Railway/Render)
+1. Root directory: `/`
+2. Build command: `npm install`
+3. Start command: `node server/index.js`
+4. Set environment variables
+
+### Database
+Already hosted on Neon PostgreSQL ✅
+
+## Contributing
+
+1. Fork the repository
+2. Create your feature branch (`git checkout -b feature/AmazingFeature`)
+3. Commit your changes (`git commit -m 'Add some AmazingFeature'`)
+4. Push to the branch (`git push origin feature/AmazingFeature`)
+5. Open a Pull Request
+
+## License
+
+This project is licensed under the MIT License.
+
+## Support
+
+For detailed setup instructions, see:
+- [GETTING_STARTED.md](./GETTING_STARTED.md)
+- [SETUP_GUIDE.md](./SETUP_GUIDE.md)
+- [IMPLEMENTATION_COMPLETE.md](./IMPLEMENTATION_COMPLETE.md)
+
+## Roadmap
+
+- [ ] Payment integration (M-Pesa, Stripe)
+- [ ] Real-time WebSocket updates
+- [ ] Mobile app (React Native)
+- [ ] Advanced analytics dashboard
+- [ ] SMS notifications
+- [ ] Multi-language support
+
+---
+
+Built with ❤️ by Talent Index
 
 3.1 High-Level Architecture
 
