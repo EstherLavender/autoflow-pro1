@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Building2, Plus, Trash2, ArrowRight, ArrowLeft, Loader2 } from 'lucide-react';
+import { Building2, Plus, Trash2, ArrowRight, ArrowLeft, Loader2, User, Phone, FileCheck, Briefcase, CreditCard } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -8,6 +8,8 @@ import { Label } from '@/components/ui/label';
 import { useAuth } from '@/context/AuthContext';
 import { AdminProfile, CarWashBusiness } from '@/types/auth';
 import { toast } from 'sonner';
+import KYCDocumentUpload from '@/components/kyc/KYCDocumentUpload';
+import PhoneVerification from '@/components/kyc/PhoneVerification';
 
 export default function AdminOnboarding() {
   const navigate = useNavigate();
@@ -21,13 +23,30 @@ export default function AdminOnboarding() {
     nationalId: '',
     numberOfCarWashes: 1,
     walletAddress: '',
+    businessName: '',
+    businessRegistrationNumber: '',
+    taxIdentificationNumber: '',
+    numberOfEmployees: '',
+    bankAccountName: '',
+    bankAccountNumber: '',
+    bankName: '',
   });
 
   const [carWashes, setCarWashes] = useState<Omit<CarWashBusiness, 'id'>[]>([
     { name: '', location: '', address: '', services: [] }
   ]);
 
-  const totalSteps = 3;
+  const [kycData, setKycData] = useState({
+    phoneVerified: false,
+    idDocumentUploaded: false,
+    businessLicenseUploaded: false,
+    taxCertificateUploaded: false,
+    idDocumentId: '',
+    businessLicenseId: '',
+    taxCertificateId: ''
+  });
+
+  const totalSteps = 7;
 
   const addCarWash = () => {
     setCarWashes([...carWashes, { name: '', location: '', address: '', services: [] }]);
@@ -53,6 +72,30 @@ export default function AdminOnboarding() {
       }
     }
     if (step === 2) {
+      if (!kycData.phoneVerified) {
+        toast.error('Please verify your phone number');
+        return false;
+      }
+    }
+    if (step === 3) {
+      if (!kycData.idDocumentUploaded) {
+        toast.error('Please upload your National ID');
+        return false;
+      }
+    }
+    if (step === 4) {
+      if (!formData.businessName || !formData.businessRegistrationNumber || !formData.taxIdentificationNumber) {
+        toast.error('Please fill in all business details');
+        return false;
+      }
+    }
+    if (step === 5) {
+      if (!kycData.businessLicenseUploaded || !kycData.taxCertificateUploaded) {
+        toast.error('Please upload all required business documents');
+        return false;
+      }
+    }
+    if (step === 6) {
       const hasInvalid = carWashes.some(cw => !cw.name || !cw.location || !cw.address);
       if (hasInvalid) {
         toast.error('Please fill in all car wash details');
@@ -120,14 +163,30 @@ export default function AdminOnboarding() {
           <CardHeader>
             <div className="flex items-center gap-3">
               <div className="h-12 w-12 rounded-xl bg-primary/10 flex items-center justify-center">
-                <Building2 className="h-6 w-6 text-primary" />
+                {step === 1 ? (
+                  <User className="h-6 w-6 text-primary" />
+                ) : step === 2 ? (
+                  <Phone className="h-6 w-6 text-primary" />
+                ) : step === 3 ? (
+                  <FileCheck className="h-6 w-6 text-primary" />
+                ) : step === 4 || step === 5 ? (
+                  <Briefcase className="h-6 w-6 text-primary" />
+                ) : step === 6 ? (
+                  <Building2 className="h-6 w-6 text-primary" />
+                ) : (
+                  <CreditCard className="h-6 w-6 text-primary" />
+                )}
               </div>
               <div>
                 <CardTitle>Car Wash Owner Setup</CardTitle>
                 <CardDescription>
                   {step === 1 && 'Personal Information'}
-                  {step === 2 && 'Your Car Wash Locations'}
-                  {step === 3 && 'Review & Submit'}
+                  {step === 2 && 'Verify Phone Number'}
+                  {step === 3 && 'Upload National ID'}
+                  {step === 4 && 'Business Details'}
+                  {step === 5 && 'Business Documents'}
+                  {step === 6 && 'Car Wash Locations'}
+                  {step === 7 && 'Review & Submit'}
                 </CardDescription>
               </div>
             </div>
@@ -172,8 +231,91 @@ export default function AdminOnboarding() {
               </div>
             )}
 
-            {/* Step 2: Car Washes */}
+            {/* Step 2: Phone Verification */}
             {step === 2 && (
+              <div className="animate-fade-in">
+                <PhoneVerification 
+                  phone={formData.phone}
+                  onVerified={() => setKycData({ ...kycData, phoneVerified: true })}
+                />
+              </div>
+            )}
+
+            {/* Step 3: ID Upload */}
+            {step === 3 && (
+              <div className="animate-fade-in">
+                <KYCDocumentUpload
+                  documentType="national_id"
+                  title="National ID"
+                  description="Upload clear photos of both sides"
+                  requiresBackImage={true}
+                  onUploadComplete={(docId) => setKycData({ ...kycData, idDocumentUploaded: true, idDocumentId: docId })}
+                />
+              </div>
+            )}
+
+            {/* Step 4: Business Details */}
+            {step === 4 && (
+              <div className="space-y-4 animate-fade-in">
+                <div className="space-y-2">
+                  <Label>Business Name *</Label>
+                  <Input
+                    placeholder="e.g. Track Wash Limited"
+                    value={formData.businessName}
+                    onChange={(e) => setFormData({ ...formData, businessName: e.target.value })}
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label>Business Registration Number *</Label>
+                  <Input
+                    placeholder="e.g. PVT-ABCD1234"
+                    value={formData.businessRegistrationNumber}
+                    onChange={(e) => setFormData({ ...formData, businessRegistrationNumber: e.target.value })}
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label>Tax Identification Number (KRA PIN) *</Label>
+                  <Input
+                    placeholder="e.g. A001234567X"
+                    value={formData.taxIdentificationNumber}
+                    onChange={(e) => setFormData({ ...formData, taxIdentificationNumber: e.target.value })}
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label>Number of Employees</Label>
+                  <Input
+                    type="number"
+                    placeholder="e.g. 5"
+                    value={formData.numberOfEmployees}
+                    onChange={(e) => setFormData({ ...formData, numberOfEmployees: e.target.value })}
+                  />
+                </div>
+              </div>
+            )}
+
+            {/* Step 5: Business Documents */}
+            {step === 5 && (
+              <div className="space-y-6 animate-fade-in">
+                <KYCDocumentUpload
+                  documentType="business_license"
+                  title="Business License"
+                  description="Upload your business registration certificate"
+                  requiresBackImage={false}
+                  onUploadComplete={(docId) => setKycData({ ...kycData, businessLicenseUploaded: true, businessLicenseId: docId })}
+                />
+                
+                <KYCDocumentUpload
+                  documentType="tax_certificate"
+                  title="Tax Compliance Certificate"
+                  description="Upload your KRA Tax Compliance Certificate"
+                  requiresBackImage={false}
+                  onUploadComplete={(docId) => setKycData({ ...kycData, taxCertificateUploaded: true, taxCertificateId: docId })}
+                />
+              </div>
+            )}
+
+            {/* Step 6: Car Washes */}
+            {step === 6 && (
               <div className="space-y-4 animate-fade-in">
                 {carWashes.map((cw, index) => (
                   <div key={index} className="p-4 border rounded-lg space-y-3">
@@ -227,18 +369,26 @@ export default function AdminOnboarding() {
               </div>
             )}
 
-            {/* Step 3: Review */}
-            {step === 3 && (
+            {/* Step 7: Review */}
+            {step === 7 && (
               <div className="space-y-4 animate-fade-in">
                 <div className="bg-muted/50 p-4 rounded-lg space-y-3">
                   <h4 className="font-medium">Personal Information</h4>
                   <div className="text-sm space-y-1">
                     <p><span className="text-muted-foreground">Name:</span> {formData.fullName}</p>
-                    <p><span className="text-muted-foreground">Phone:</span> {formData.phone}</p>
-                    <p><span className="text-muted-foreground">National ID:</span> {formData.nationalId}</p>
-                    {formData.walletAddress && (
-                      <p><span className="text-muted-foreground">M-Pesa:</span> {formData.walletAddress}</p>
-                    )}
+                    <p><span className="text-muted-foreground">Phone:</span> {formData.phone} ✓</p>
+                    <p><span className="text-muted-foreground">National ID:</span> {formData.nationalId} ✓</p>
+                  </div>
+                </div>
+
+                <div className="bg-muted/50 p-4 rounded-lg space-y-3">
+                  <h4 className="font-medium">Business Information</h4>
+                  <div className="text-sm space-y-1">
+                    <p><span className="text-muted-foreground">Business Name:</span> {formData.businessName}</p>
+                    <p><span className="text-muted-foreground">Registration No:</span> {formData.businessRegistrationNumber}</p>
+                    <p><span className="text-muted-foreground">KRA PIN:</span> {formData.taxIdentificationNumber}</p>
+                    <p className="text-green-600">✓ Business License Uploaded</p>
+                    <p className="text-green-600">✓ Tax Certificate Uploaded</p>
                   </div>
                 </div>
                 
@@ -254,7 +404,7 @@ export default function AdminOnboarding() {
 
                 <div className="bg-warning/10 border border-warning/20 p-4 rounded-lg">
                   <p className="text-sm text-warning-foreground">
-                    ⚠️ Your account will be reviewed before activation. This usually takes 24-48 hours.
+                    ⚠️ Your application will be reviewed by our team. This usually takes 24-48 hours. You'll be notified once approved.
                   </p>
                 </div>
               </div>
