@@ -6,7 +6,6 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/com
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useAuth } from '@/context/AuthContext';
-import { CustomerProfile, CustomerVehicle } from '@/types/auth';
 import { toast } from 'sonner';
 import KYCDocumentUpload from '@/components/kyc/KYCDocumentUpload';
 import PhoneVerification from '@/components/kyc/PhoneVerification';
@@ -78,21 +77,18 @@ export default function CustomerOnboarding() {
     setIsLoading(true);
     
     try {
-      const profile: CustomerProfile = {
+      // In a real app, you would save this to the backend
+      // For now, we'll just save to localStorage
+      const profile = {
         userId: user.id,
         fullName: formData.fullName,
         phone: formData.phone,
         email: formData.email,
-        vehicles: [
-          {
-            ...vehicle,
-            id: `v-${Date.now()}`,
-          },
-        ],
+        vehicle: vehicle,
+        kycCompleted: true
       };
 
-      updateProfile(profile);
-      completeOnboarding();
+      localStorage.setItem('customerProfile', JSON.stringify(profile));
       
       toast.success('Welcome to Track Wash! 🎉');
       navigate('/customer');
