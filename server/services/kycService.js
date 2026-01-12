@@ -600,6 +600,71 @@ class KYCService {
   }
 
   /**
+   * Get pending KYC reviews (Admin)
+   */
+  async getPendingReviews() {
+    const result = await pool.query(
+      `SELECT 
+        u.id, u.email, u.role, u.full_name, u.phone,
+        kp.kyc_status, kp.kyc_submitted_at, kp.business_name,
+        COUNT(kd.id) as document_count
+      FROM users u
+      INNER JOIN kyc_profiles kp ON u.id = kp.user_id
+      LEFT JOIN kyc_documents kd ON u.id = kd.user_id
+      WHERE kp.kyc_status = 'pending_review'
+      GROUP BY u.id, u.email, u.role, u.full_name, u.phone, kp.kyc_status, kp.kyc_submitted_at, kp.business_name
+      ORDER BY kp.kyc_submitted_at DESC`
+    );
+
+    return result.rows;
+  }
+
+  /**
+   * Get document by ID
+   */
+  async getDocument(documentId, userId) {
+    const result = await pool.query(
+      'SELECT * FROM kyc_documents WHERE id = $1 AND user_id = $2',
+      [documentId, userId]
+    );
+
+    return result.rows[0] || null;
+  }
+
+  /**
+   * Delete document
+   */
+  async deleteDocument(documentId, userId) {
+    const result = await pool.query(
+      'DELETE FROM kyc_documents WHERE id = $1 AND user_id = $2 RETURNING *',
+      [documentId, userId]
+    );
+
+    if (result.rows.length === 0) {
+      throw new Error('Document not found or access denied');
+    }
+
+    return result.rows[0];
+  }
+
+  /**
+   * Get audit log
+   */
+  async getAuditLog(userId) {
+    const result = await pool.query(
+      `SELECT al.*, u.full_name as changed_by_name
+       FROM kyc_audit_log al
+       LEFT JOIN users u ON al.changed_by = u.id
+       WHERE al.user_id = $1
+       ORDER BY al.created_at DESC
+       LIMIT 100`,
+      [userId]
+    );
+
+    return result.rows;
+  }
+
+  /**
    * Log audit trail
    */
   async logAudit(client, userId, action, changedBy, changes, ipAddress = null, userAgent = null) {
