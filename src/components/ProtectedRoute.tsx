@@ -1,17 +1,16 @@
 import { Navigate } from 'react-router-dom'
-import { useAuth } from '../contexts/AuthContext'
-import { UserRole } from '../lib/supabase'
+import { useAuth } from '../context/AuthContext'
+
+type UserRole = 'admin' | 'detailer' | 'customer'
 
 interface ProtectedRouteProps {
   children: React.ReactNode
   allowedRoles?: UserRole[]
-  requireActive?: boolean
 }
 
 export function ProtectedRoute({
   children,
   allowedRoles,
-  requireActive = true,
 }: ProtectedRouteProps) {
   const { user, loading } = useAuth()
 
@@ -35,12 +34,12 @@ export function ProtectedRoute({
   }
 
   if (user.status === 'suspended') {
-    return <Navigate to="/suspended" replace />
+    return <Navigate to="/login" replace />
   }
 
   // Check role
   if (allowedRoles && !allowedRoles.includes(user.role)) {
-    return <Navigate to="/unauthorized" replace />
+    return <Navigate to="/login" replace />
   }
 
   // All checks passed

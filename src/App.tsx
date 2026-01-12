@@ -1,18 +1,17 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
-import { AuthProvider } from './contexts/AuthContext'
+import { AuthProvider } from './context/AuthContext'
 import { ProtectedRoute } from './components/ProtectedRoute'
 
 // Pages
+import LandingPage from './pages/LandingPage'
 import LoginPage from './pages/LoginPage'
-import SignUpPage from './pages/SignUpPage'
+import NotFound from './pages/NotFound'
 import PendingApprovalPage from './pages/PendingApprovalPage'
-import UnauthorizedPage from './pages/UnauthorizedPage'
-import SuspendedPage from './pages/SuspendedPage'
 
 // Role-specific layouts
-import AdminLayout from './layouts/AdminLayout'
-import DetailerLayout from './layouts/DetailerLayout'
-import CustomerLayout from './layouts/CustomerLayout'
+import AdminLayout from './components/layout/AdminLayout'
+import OperatorLayout from './components/layout/OperatorLayout'
+import CustomerLayout from './components/layout/CustomerLayout'
 
 function App() {
   return (
@@ -20,11 +19,9 @@ function App() {
       <AuthProvider>
         <Routes>
           {/* Public routes */}
+          <Route path="/" element={<LandingPage />} />
           <Route path="/login" element={<LoginPage />} />
-          <Route path="/signup" element={<SignUpPage />} />
           <Route path="/pending-approval" element={<PendingApprovalPage />} />
-          <Route path="/unauthorized" element={<UnauthorizedPage />} />
-          <Route path="/suspended" element={<SuspendedPage />} />
 
           {/* Protected routes */}
           <Route
@@ -36,10 +33,10 @@ function App() {
             }
           />
           <Route
-            path="/detailer/*"
+            path="/operator/*"
             element={
               <ProtectedRoute allowedRoles={['detailer']}>
-                <DetailerLayout />
+                <OperatorLayout />
               </ProtectedRoute>
             }
           />
@@ -52,8 +49,8 @@ function App() {
             }
           />
 
-          {/* Default redirect */}
-          <Route path="*" element={<Navigate to="/login" replace />} />
+          {/* 404 */}
+          <Route path="*" element={<NotFound />} />
         </Routes>
       </AuthProvider>
     </BrowserRouter>
