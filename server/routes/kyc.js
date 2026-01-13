@@ -10,7 +10,7 @@ const router = express.Router();
  */
 router.post('/profile', authenticateToken, async (req, res) => {
   try {
-    const { userId, role } = req.user;
+    const { id: userId, role } = req.user;
     const profileData = req.body;
 
     const profile = await kycService.createKYCProfile(userId, profileData, role);
@@ -30,7 +30,7 @@ router.post('/profile', authenticateToken, async (req, res) => {
  */
 router.put('/profile', authenticateToken, async (req, res) => {
   try {
-    const { userId, role } = req.user;
+    const { id: userId, role } = req.user;
     const updates = req.body;
 
     const profile = await kycService.updateKYCProfile(userId, updates, role);
@@ -57,7 +57,7 @@ router.post('/documents/upload',
   ]),
   async (req, res) => {
     try {
-      const { userId } = req.user;
+      const { id: userId } = req.user;
       const { documentType, documentNumber, expiryDate } = req.body;
 
       if (!req.files || !req.files.frontImage) {
@@ -91,7 +91,7 @@ router.post('/documents/upload',
  */
 router.get('/status', authenticateToken, async (req, res) => {
   try {
-    const { userId } = req.user;
+    const { id: userId } = req.user;
     
     const status = await kycService.getKYCStatus(userId);
     
@@ -107,7 +107,7 @@ router.get('/status', authenticateToken, async (req, res) => {
  */
 router.post('/verify/phone/send', authenticateToken, async (req, res) => {
   try {
-    const { userId } = req.user;
+    const { id: userId } = req.user;
     const { phone } = req.body;
 
     if (!phone) {
@@ -128,7 +128,7 @@ router.post('/verify/phone/send', authenticateToken, async (req, res) => {
  */
 router.post('/verify/phone/confirm', authenticateToken, async (req, res) => {
   try {
-    const { userId } = req.user;
+    const { id: userId } = req.user;
     const { phone, otpCode } = req.body;
 
     if (!phone || !otpCode) {
@@ -149,7 +149,7 @@ router.post('/verify/phone/confirm', authenticateToken, async (req, res) => {
  */
 router.post('/verify/email/send', authenticateToken, async (req, res) => {
   try {
-    const { userId } = req.user;
+    const { id: userId } = req.user;
     const { email } = req.body;
 
     if (!email) {
@@ -170,7 +170,7 @@ router.post('/verify/email/send', authenticateToken, async (req, res) => {
  */
 router.post('/verify/email/confirm', authenticateToken, async (req, res) => {
   try {
-    const { userId } = req.user;
+    const { id: userId } = req.user;
     const { email, verificationCode } = req.body;
 
     if (!email || !verificationCode) {
@@ -247,7 +247,7 @@ router.post('/admin/review', authenticateToken, async (req, res) => {
  */
 router.get('/documents/:documentId', authenticateToken, async (req, res) => {
   try {
-    const { userId } = req.user;
+    const { id: userId } = req.user;
     const { documentId } = req.params;
 
     const document = await kycService.getDocument(documentId, userId);
@@ -268,7 +268,7 @@ router.get('/documents/:documentId', authenticateToken, async (req, res) => {
  */
 router.delete('/documents/:documentId', authenticateToken, async (req, res) => {
   try {
-    const { userId } = req.user;
+    const { id: userId } = req.user;
     const { documentId } = req.params;
 
     await kycService.deleteDocument(documentId, userId);
