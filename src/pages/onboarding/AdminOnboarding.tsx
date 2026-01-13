@@ -167,7 +167,7 @@ export default function AdminOnboarding() {
                 {step === 1 ? (
                   <User className="h-6 w-6 text-primary" />
                 ) : step === 2 ? (
-                  <Phone className="h-6 w-6 text-primary" />
+                  <Mail className="h-6 w-6 text-primary" />
                 ) : step === 3 ? (
                   <FileCheck className="h-6 w-6 text-primary" />
                 ) : step === 4 || step === 5 ? (
@@ -182,7 +182,7 @@ export default function AdminOnboarding() {
                 <CardTitle>Car Wash Owner Setup</CardTitle>
                 <CardDescription>
                   {step === 1 && 'Personal Information'}
-                  {step === 2 && 'Verify Phone Number'}
+                  {step === 2 && 'Verify Email Address'}
                   {step === 3 && 'Upload National ID'}
                   {step === 4 && 'Business Details'}
                   {step === 5 && 'Business Documents'}
@@ -214,6 +214,15 @@ export default function AdminOnboarding() {
                   />
                 </div>
                 <div className="space-y-2">
+                  <Label>Email Address *</Label>
+                  <Input
+                    type="email"
+                    placeholder="john@example.com"
+                    value={formData.email}
+                    onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                  />
+                </div>
+                <div className="space-y-2">
                   <Label>National ID *</Label>
                   <Input
                     placeholder="12345678"
@@ -232,12 +241,12 @@ export default function AdminOnboarding() {
               </div>
             )}
 
-            {/* Step 2: Phone Verification */}
+            {/* Step 2: Email Verification */}
             {step === 2 && (
               <div className="animate-fade-in">
-                <PhoneVerification 
-                  phone={formData.phone}
-                  onVerified={() => setKycData({ ...kycData, phoneVerified: true })}
+                <EmailVerification 
+                  email={formData.email}
+                  onVerified={() => setKycData({ ...kycData, emailVerified: true })}
                 />
               </div>
             )}
