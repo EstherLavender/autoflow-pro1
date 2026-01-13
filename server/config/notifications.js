@@ -161,6 +161,7 @@ module.exports = {
   sendEmail,
   sendEmailDirect,
   emailTemplates,
+  transporter,
   createNotification,
   getUserNotifications,
   markAsRead
