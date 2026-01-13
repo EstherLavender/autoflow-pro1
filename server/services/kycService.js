@@ -1,18 +1,20 @@
 const pool = require('../config/database');
 const crypto = require('crypto');
-const { emailTemplates } = require('../config/notifications');
+const { emailTemplates, sendEmail } = require('../config/notifications');
 const nodemailer = require('nodemailer');
 
-// Create email transporter
-const transporter = nodemailer.createTransporter({
-  host: process.env.SMTP_HOST || 'smtp.gmail.com',
-  port: process.env.SMTP_PORT || 587,
-  secure: false,
-  auth: {
-    user: process.env.SMTP_USER,
-    pass: process.env.SMTP_PASS
-  }
-});
+// Create email transporter for KYC emails
+const createTransporter = () => {
+  return nodemailer.createTransporter({
+    host: process.env.SMTP_HOST || 'smtp.gmail.com',
+    port: process.env.SMTP_PORT || 587,
+    secure: false,
+    auth: {
+      user: process.env.SMTP_USER,
+      pass: process.env.SMTP_PASS
+    }
+  });
+};
 
 /**
  * KYC Verification Service
@@ -562,6 +564,7 @@ class KYCService {
 
     // Send email with verification code
     try {
+      const transporter = createTransporter();
       const emailContent = emailTemplates.emailVerification(userName, verificationCode);
       
       await transporter.sendMail({
