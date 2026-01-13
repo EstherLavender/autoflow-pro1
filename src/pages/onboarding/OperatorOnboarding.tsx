@@ -186,6 +186,15 @@ export default function OperatorOnboarding() {
                   />
                 </div>
                 <div className="space-y-2">
+                  <Label>Email Address *</Label>
+                  <Input
+                    type="email"
+                    placeholder="peter@example.com"
+                    value={formData.email}
+                    onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                  />
+                </div>
+                <div className="space-y-2">
                   <Label>National ID *</Label>
                   <Input
                     placeholder="12345678"
@@ -207,12 +216,12 @@ export default function OperatorOnboarding() {
               </div>
             )}
 
-            {/* Step 2: Phone Verification */}
+            {/* Step 2: Email Verification */}
             {step === 2 && (
               <div className="animate-fade-in">
-                <PhoneVerification 
-                  phone={formData.phone}
-                  onVerified={() => setKycData({ ...kycData, phoneVerified: true })}
+                <EmailVerification 
+                  email={formData.email}
+                  onVerified={() => setKycData({ ...kycData, emailVerified: true })}
                 />
               </div>
             )}
