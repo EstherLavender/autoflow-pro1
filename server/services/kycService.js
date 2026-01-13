@@ -571,6 +571,8 @@ class KYCService {
    * Verify email code
    */
   async verifyEmail(userId, email, verificationCode) {
+    console.log('Verifying email:', { userId, email, verificationCode });
+    
     const result = await pool.query(
       `SELECT * FROM email_verifications 
        WHERE user_id = $1 AND email = $2 AND verification_token = $3
@@ -579,7 +581,19 @@ class KYCService {
       [userId, email, verificationCode]
     );
 
+    console.log('Query result:', result.rows.length, 'rows found');
+    
     if (result.rows.length === 0) {
+      // Check if code exists but is expired or wrong
+      const debugResult = await pool.query(
+        `SELECT id, user_id, email, verification_token, verified, expires_at, expires_at < NOW() as expired
+         FROM email_verifications 
+         WHERE user_id = $1 AND email = $2
+         ORDER BY id DESC LIMIT 1`,
+        [userId, email]
+      );
+      console.log('Debug - Latest verification record:', debugResult.rows[0]);
+      
       return { success: false, message: 'Invalid or expired verification code' };
     }
 
@@ -591,11 +605,26 @@ class KYCService {
       [verification.id]
     );
 
-    // Update KYC profile
-    await pool.query(
-      `UPDATE kyc_profiles SET email_verified = true WHERE user_id = $1`,
+    // Update KYC profile (create if not exists)
+    const profileCheck = await pool.query(
+      'SELECT id FROM kyc_profiles WHERE user_id = $1',
       [verification.user_id]
     );
+    
+    if (profileCheck.rows.length === 0) {
+      // Create basic KYC profile if it doesn't exist
+      await pool.query(
+        `INSERT INTO kyc_profiles (user_id, email_verified, kyc_status) 
+         VALUES ($1, true, 'incomplete')`,
+        [verification.user_id]
+      );
+    } else {
+      // Update existing profile
+      await pool.query(
+        `UPDATE kyc_profiles SET email_verified = true WHERE user_id = $1`,
+        [verification.user_id]
+      );
+    }
 
     return { success: true, message: 'Email verified successfully', userId: verification.user_id };
   }
