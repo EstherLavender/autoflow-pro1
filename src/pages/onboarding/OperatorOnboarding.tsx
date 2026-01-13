@@ -134,7 +134,7 @@ export default function OperatorOnboarding() {
                 {step === 1 ? (
                   <User className="h-6 w-6 text-primary" />
                 ) : step === 2 ? (
-                  <Phone className="h-6 w-6 text-primary" />
+                  <Mail className="h-6 w-6 text-primary" />
                 ) : step === 3 || step === 4 ? (
                   <FileCheck className="h-6 w-6 text-primary" />
                 ) : (
@@ -144,7 +144,7 @@ export default function OperatorOnboarding() {
               <div>
                 <CardTitle>
                   {step === 1 ? 'Your Details' : 
-                   step === 2 ? 'Verify Phone' :
+                   step === 2 ? 'Verify Email' :
                    step === 3 ? 'Upload ID' :
                    step === 4 ? 'Proof of Address' :
                    'Work Experience'}
@@ -153,7 +153,7 @@ export default function OperatorOnboarding() {
                   {step === 1 
                     ? "Tell us about yourself"
                     : step === 2 
-                    ? "Verify your phone number"
+                    ? "Verify your email address"
                     : step === 3
                     ? "Upload your National ID"
                     : step === 4

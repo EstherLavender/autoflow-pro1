@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Building2, Plus, Trash2, ArrowRight, ArrowLeft, Loader2, User, Phone, FileCheck, Briefcase, CreditCard } from 'lucide-react';
+import { Building2, Plus, Trash2, ArrowRight, ArrowLeft, Loader2, User, Mail, FileCheck, Briefcase, CreditCard } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -8,7 +8,7 @@ import { Label } from '@/components/ui/label';
 import { useAuth } from '@/context/AuthContext';
 import { toast } from 'sonner';
 import KYCDocumentUpload from '@/components/kyc/KYCDocumentUpload';
-import PhoneVerification from '@/components/kyc/PhoneVerification';
+import EmailVerification from '@/components/kyc/PhoneVerification';
 
 export default function AdminOnboarding() {
   const navigate = useNavigate();
@@ -19,6 +19,7 @@ export default function AdminOnboarding() {
   const [formData, setFormData] = useState({
     fullName: '',
     phone: user?.phone || '',
+    email: user?.email || '',
     nationalId: '',
     numberOfCarWashes: 1,
     walletAddress: '',
@@ -36,7 +37,7 @@ export default function AdminOnboarding() {
   ]);
 
   const [kycData, setKycData] = useState({
-    phoneVerified: false,
+    emailVerified: false,
     idDocumentUploaded: false,
     businessLicenseUploaded: false,
     taxCertificateUploaded: false,
@@ -65,14 +66,14 @@ export default function AdminOnboarding() {
 
   const validateStep = (): boolean => {
     if (step === 1) {
-      if (!formData.fullName || !formData.phone || !formData.nationalId) {
+      if (!formData.fullName || !formData.phone || !formData.email || !formData.nationalId) {
         toast.error('Please fill in all required fields');
         return false;
       }
     }
     if (step === 2) {
-      if (!kycData.phoneVerified) {
-        toast.error('Please verify your phone number');
+      if (!kycData.emailVerified) {
+        toast.error('Please verify your email address');
         return false;
       }
     }
