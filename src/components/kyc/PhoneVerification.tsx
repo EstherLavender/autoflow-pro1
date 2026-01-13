@@ -102,7 +102,7 @@ export default function EmailVerification({ email, onVerified }: EmailVerificati
         <CardContent className="pt-6">
           <div className="flex items-center justify-center gap-3 text-green-600">
             <CheckCircle2 className="h-6 w-6" />
-            <span className="font-medium">Phone number verified</span>
+            <span className="font-medium">Email verified</span>
           </div>
         </CardContent>
       </Card>
@@ -114,28 +114,28 @@ export default function EmailVerification({ email, onVerified }: EmailVerificati
       <CardHeader>
         <div className="flex items-center gap-3">
           <div className="h-10 w-10 rounded-lg bg-primary/10 flex items-center justify-center">
-            <Phone className="h-5 w-5 text-primary" />
+            <Mail className="h-5 w-5 text-primary" />
           </div>
           <div>
-            <CardTitle className="text-lg">Verify Phone Number</CardTitle>
-            <CardDescription>We'll send you a verification code</CardDescription>
+            <CardTitle className="text-lg">Verify Email Address</CardTitle>
+            <CardDescription>We'll send you a 6-digit verification code</CardDescription>
           </div>
         </div>
       </CardHeader>
 
       <CardContent className="space-y-4">
         <div className="space-y-2">
-          <Label>Phone Number</Label>
+          <Label>Email Address</Label>
           <Input
-            value={phone}
+            value={email}
             disabled
             className="bg-muted"
           />
         </div>
 
-        {!otpSent ? (
+        {!codeSent ? (
           <Button
-            onClick={sendOTP}
+            onClick={sendVerificationCode}
             disabled={isLoading}
             className="w-full"
             size="lg"
@@ -157,15 +157,15 @@ export default function EmailVerification({ email, onVerified }: EmailVerificati
                 type="text"
                 maxLength={6}
                 placeholder="000000"
-                value={otpCode}
-                onChange={(e) => setOtpCode(e.target.value.replace(/\D/g, ''))}
+                value={verificationCode}
+                onChange={(e) => setVerificationCode(e.target.value.replace(/\D/g, ''))}
                 className="text-center text-2xl tracking-widest"
               />
             </div>
 
             <Button
-              onClick={verifyOTP}
-              disabled={isLoading || otpCode.length !== 6}
+              onClick={verifyCode}
+              disabled={isLoading || verificationCode.length !== 6}
               className="w-full"
               size="lg"
             >
@@ -187,7 +187,7 @@ export default function EmailVerification({ email, onVerified }: EmailVerificati
               ) : (
                 <Button
                   variant="link"
-                  onClick={sendOTP}
+                  onClick={sendVerificationCode}
                   disabled={isLoading}
                   className="text-sm"
                 >
