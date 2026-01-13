@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Car, User, ArrowRight, ArrowLeft, Loader2, FileCheck, Phone } from 'lucide-react';
+import { Car, User, ArrowRight, ArrowLeft, Loader2, FileCheck, Mail } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -8,7 +8,7 @@ import { Label } from '@/components/ui/label';
 import { useAuth } from '@/context/AuthContext';
 import { toast } from 'sonner';
 import KYCDocumentUpload from '@/components/kyc/KYCDocumentUpload';
-import PhoneVerification from '@/components/kyc/PhoneVerification';
+import EmailVerification from '@/components/kyc/PhoneVerification';
 
 export default function CustomerOnboarding() {
   const navigate = useNavigate();
@@ -29,7 +29,7 @@ export default function CustomerOnboarding() {
   });
 
   const [kycData, setKycData] = useState({
-    phoneVerified: false,
+    emailVerified: false,
     documentUploaded: false,
     documentId: ''
   });
@@ -44,8 +44,8 @@ export default function CustomerOnboarding() {
       }
     }
     if (step === 2) {
-      if (!kycData.phoneVerified) {
-        toast.error('Please verify your phone number');
+      if (!kycData.emailVerified) {
+        toast.error('Please verify your email address');
         return false;
       }
     }
@@ -123,7 +123,7 @@ export default function CustomerOnboarding() {
                 {step === 1 ? (
                   <User className="h-6 w-6 text-primary" />
                 ) : step === 2 ? (
-                  <Phone className="h-6 w-6 text-primary" />
+                  <Mail className="h-6 w-6 text-primary" />
                 ) : step === 3 ? (
                   <FileCheck className="h-6 w-6 text-primary" />
                 ) : (
@@ -133,7 +133,7 @@ export default function CustomerOnboarding() {
               <div>
                 <CardTitle>
                   {step === 1 ? 'Your Details' : 
-                   step === 2 ? 'Verify Phone' :
+                   step === 2 ? 'Verify Email' :
                    step === 3 ? 'Upload ID' :
                    'Add Your Vehicle'}
                 </CardTitle>
@@ -141,7 +141,7 @@ export default function CustomerOnboarding() {
                   {step === 1 
                     ? "Let's get to know you"
                     : step === 2 
-                    ? "Verify your phone number"
+                    ? "Verify your email address"
                     : step === 3
                     ? "Upload your ID for verification"
                     : "Tell us about your car"
@@ -183,12 +183,12 @@ export default function CustomerOnboarding() {
               </div>
             )}
 
-            {/* Step 2: Phone Verification */}
+            {/* Step 2: Email Verification */}
             {step === 2 && (
               <div className="animate-fade-in">
-                <PhoneVerification 
-                  phone={formData.phone}
-                  onVerified={() => setKycData({ ...kycData, phoneVerified: true })}
+                <EmailVerification 
+                  email={formData.email}
+                  onVerified={() => setKycData({ ...kycData, emailVerified: true })}
                 />
               </div>
             )}

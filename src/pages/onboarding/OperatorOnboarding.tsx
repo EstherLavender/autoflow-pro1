@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Wrench, ArrowRight, Loader2, Phone, FileCheck, User, ArrowLeft } from 'lucide-react';
+import { Wrench, ArrowRight, Loader2, Mail, FileCheck, User, ArrowLeft } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -8,7 +8,7 @@ import { Label } from '@/components/ui/label';
 import { useAuth } from '@/context/AuthContext';
 import { toast } from 'sonner';
 import KYCDocumentUpload from '@/components/kyc/KYCDocumentUpload';
-import PhoneVerification from '@/components/kyc/PhoneVerification';
+import EmailVerification from '@/components/kyc/PhoneVerification';
 
 export default function OperatorOnboarding() {
   const navigate = useNavigate();
@@ -19,6 +19,7 @@ export default function OperatorOnboarding() {
   const [formData, setFormData] = useState({
     fullName: '',
     phone: user?.phone || '',
+    email: user?.email || '',
     nationalId: '',
     inviteCode: '',
     yearsOfExperience: '',
@@ -27,7 +28,7 @@ export default function OperatorOnboarding() {
   });
 
   const [kycData, setKycData] = useState({
-    phoneVerified: false,
+    emailVerified: false,
     idDocumentUploaded: false,
     addressDocumentUploaded: false,
     idDocumentId: '',
@@ -38,14 +39,14 @@ export default function OperatorOnboarding() {
 
   const validateStep = (): boolean => {
     if (step === 1) {
-      if (!formData.fullName || !formData.phone || !formData.nationalId) {
+      if (!formData.fullName || !formData.phone || !formData.email || !formData.nationalId) {
         toast.error('Please fill in all required fields');
         return false;
       }
     }
     if (step === 2) {
-      if (!kycData.phoneVerified) {
-        toast.error('Please verify your phone number');
+      if (!kycData.emailVerified) {
+        toast.error('Please verify your email address');
         return false;
       }
     }
