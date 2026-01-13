@@ -69,6 +69,23 @@ const emailTemplates = {
       <p><strong>Vehicle:</strong> ${bookingDetails.vehicle}</p>
       <p>Best regards,<br>AutoFlow Pro Team</p>
     `
+  }),
+  
+  emailVerification: (userName, verificationCode) => ({
+    subject: 'Email Verification Code - AutoFlow Pro',
+    html: `
+      <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+        <h2 style="color: #2563eb;">Email Verification</h2>
+        <p>Hi ${userName},</p>
+        <p>Your verification code is:</p>
+        <div style="background-color: #f3f4f6; padding: 20px; text-align: center; margin: 20px 0; border-radius: 8px;">
+          <h1 style="font-size: 32px; letter-spacing: 8px; margin: 0; color: #1f2937;">${verificationCode}</h1>
+        </div>
+        <p>This code will expire in 10 minutes.</p>
+        <p style="color: #6b7280; font-size: 14px;">If you didn't request this code, please ignore this email.</p>
+        <p>Best regards,<br>AutoFlow Pro Team</p>
+      </div>
+    `
   })
 };
 
@@ -82,6 +99,24 @@ const sendEmail = async (to, template, data) => {
       to: to,
       subject: emailContent.subject,
       html: emailContent.html
+    });
+
+    console.log('Email sent:', info.messageId);
+    return { success: true, messageId: info.messageId };
+  } catch (error) {
+    console.error('Error sending email:', error);
+    return { success: false, error: error.message };
+  }
+};
+
+// Send custom email directly
+const sendEmailDirect = async (to, subject, html) => {
+  try {
+    const info = await transporter.sendMail({
+      from: `"AutoFlow Pro" <${process.env.SMTP_USER}>`,
+      to: to,
+      subject: subject,
+      html: html
     });
 
     console.log('Email sent:', info.messageId);
@@ -124,6 +159,8 @@ const markAsRead = (notificationId) => {
 
 module.exports = {
   sendEmail,
+  sendEmailDirect,
+  emailTemplates,
   createNotification,
   getUserNotifications,
   markAsRead

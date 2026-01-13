@@ -1,5 +1,18 @@
 const pool = require('../config/database');
 const crypto = require('crypto');
+const { emailTemplates } = require('../config/notifications');
+const nodemailer = require('nodemailer');
+
+// Create email transporter
+const transporter = nodemailer.createTransporter({
+  host: process.env.SMTP_HOST || 'smtp.gmail.com',
+  port: process.env.SMTP_PORT || 587,
+  secure: false,
+  auth: {
+    user: process.env.SMTP_USER,
+    pass: process.env.SMTP_PASS
+  }
+});
 
 /**
  * KYC Verification Service
@@ -528,37 +541,58 @@ class KYCService {
   }
 
   /**
-   * Generate email verification token
+   * Generate email verification code and send email
    */
   async sendEmailVerification(userId, email) {
-    const token = crypto.randomBytes(32).toString('hex');
-    const expiresAt = new Date(Date.now() + 24 * 60 * 60 * 1000); // 24 hours
+    const verificationCode = Math.floor(100000 + Math.random() * 900000).toString();
+    const expiresAt = new Date(Date.now() + 10 * 60 * 1000); // 10 minutes
 
     await pool.query(
       `INSERT INTO email_verifications (user_id, email, verification_token, expires_at)
        VALUES ($1, $2, $3, $4)`,
-      [userId, email, token, expiresAt]
+      [userId, email, verificationCode, expiresAt]
     );
 
-    // In production, send email with verification link
-    const verificationUrl = `${process.env.APP_URL}/verify-email?token=${token}`;
-    console.log(`Email verification URL: ${verificationUrl}`);
+    // Get user's name for email
+    const userResult = await pool.query(
+      'SELECT full_name FROM kyc_profiles WHERE user_id = $1',
+      [userId]
+    );
+    const userName = userResult.rows[0]?.full_name || 'User';
 
-    return { success: true, message: 'Verification email sent' };
+    // Send email with verification code
+    try {
+      const emailContent = emailTemplates.emailVerification(userName, verificationCode);
+      
+      await transporter.sendMail({
+        from: `"AutoFlow Pro" <${process.env.SMTP_USER}>`,
+        to: email,
+        subject: emailContent.subject,
+        html: emailContent.html
+      });
+
+      console.log(`Verification code sent to ${email}: ${verificationCode}`);
+      return { success: true, message: 'Verification code sent to your email' };
+    } catch (error) {
+      console.error('Error sending verification email:', error);
+      return { success: false, message: 'Failed to send verification email' };
+    }
   }
 
   /**
-   * Verify email token
+   * Verify email code
    */
-  async verifyEmail(token) {
+  async verifyEmail(userId, email, verificationCode) {
     const result = await pool.query(
       `SELECT * FROM email_verifications 
-       WHERE verification_token = $1 AND verified = false AND expires_at > NOW()`,
-      [token]
+       WHERE user_id = $1 AND email = $2 AND verification_token = $3
+       AND verified = false AND expires_at > NOW()
+       ORDER BY id DESC LIMIT 1`,
+      [userId, email, verificationCode]
     );
 
     if (result.rows.length === 0) {
-      return { success: false, message: 'Invalid or expired token' };
+      return { success: false, message: 'Invalid or expired verification code' };
     }
 
     const verification = result.rows[0];
@@ -575,7 +609,7 @@ class KYCService {
       [verification.user_id]
     );
 
-    return { success: true, message: 'Email verified', userId: verification.user_id };
+    return { success: true, message: 'Email verified successfully', userId: verification.user_id };
   }
 
   /**

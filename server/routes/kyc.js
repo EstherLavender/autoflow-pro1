@@ -166,20 +166,20 @@ router.post('/verify/email/send', authenticateToken, async (req, res) => {
 });
 
 /**
- * Verify Email Token (public route)
+ * Verify Email Code (protected route)
  */
-router.get('/verify/email/confirm', async (req, res) => {
+router.post('/verify/email/confirm', authenticateToken, async (req, res) => {
   try {
-    const { token } = req.query;
+    const { userId } = req.user;
+    const { email, verificationCode } = req.body;
 
-    if (!token) {
-      return res.status(400).json({ error: 'Token is required' });
+    if (!email || !verificationCode) {
+      return res.status(400).json({ error: 'Email and verification code are required' });
     }
 
-    const result = await kycService.verifyEmail(token);
+    const result = await kycService.verifyEmail(userId, email, verificationCode);
     
     if (result.success) {
-      // Redirect to success page or return success message
       res.json(result);
     } else {
       res.status(400).json(result);

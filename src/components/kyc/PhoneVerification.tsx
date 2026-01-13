@@ -1,42 +1,42 @@
 import { useState } from 'react';
-import { Phone, Loader2, CheckCircle2 } from 'lucide-react';
+import { Mail, Loader2, CheckCircle2 } from 'lucide-react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { toast } from 'sonner';
 
-interface PhoneVerificationProps {
-  phone: string;
+interface EmailVerificationProps {
+  email: string;
   onVerified?: () => void;
 }
 
-export default function PhoneVerification({ phone, onVerified }: PhoneVerificationProps) {
-  const [otpSent, setOtpSent] = useState(false);
-  const [otpCode, setOtpCode] = useState('');
+export default function EmailVerification({ email, onVerified }: EmailVerificationProps) {
+  const [codeSent, setCodeSent] = useState(false);
+  const [verificationCode, setVerificationCode] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [isVerified, setIsVerified] = useState(false);
   const [countdown, setCountdown] = useState(0);
 
-  const sendOTP = async () => {
+  const sendVerificationCode = async () => {
     setIsLoading(true);
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch('/api/kyc/verify/phone/send', {
+      const response = await fetch('/api/kyc/verify/email/send', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${token}`
         },
-        body: JSON.stringify({ phone })
+        body: JSON.stringify({ email })
       });
 
-      if (!response.ok) throw new Error('Failed to send OTP');
+      if (!response.ok) throw new Error('Failed to send verification code');
 
       const data = await response.json();
-      setOtpSent(true);
+      setCodeSent(true);
       setCountdown(60);
-      toast.success('OTP sent to your phone!');
+      toast.success('Verification code sent to your email!');
 
       // Start countdown
       const interval = setInterval(() => {
@@ -50,29 +50,29 @@ export default function PhoneVerification({ phone, onVerified }: PhoneVerificati
       }, 1000);
 
     } catch (error) {
-      console.error('Send OTP error:', error);
-      toast.error('Failed to send OTP. Please try again.');
+      console.error('Send verification code error:', error);
+      toast.error('Failed to send verification code. Please try again.');
     } finally {
       setIsLoading(false);
     }
   };
 
-  const verifyOTP = async () => {
-    if (otpCode.length !== 6) {
-      toast.error('Please enter a valid 6-digit OTP');
+  const verifyCode = async () => {
+    if (verificationCode.length !== 6) {
+      toast.error('Please enter a valid 6-digit code');
       return;
     }
 
     setIsLoading(true);
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch('/api/kyc/verify/phone/confirm', {
+      const response = await fetch('/api/kyc/verify/email/confirm', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${token}`
         },
-        body: JSON.stringify({ phone, otpCode })
+        body: JSON.stringify({ email, verificationCode })
       });
 
       const data = await response.json();
@@ -82,15 +82,15 @@ export default function PhoneVerification({ phone, onVerified }: PhoneVerificati
       }
 
       setIsVerified(true);
-      toast.success('Phone number verified! ✓');
+      toast.success('Email verified! ✓');
       
       if (onVerified) {
         onVerified();
       }
 
     } catch (error: any) {
-      console.error('Verify OTP error:', error);
-      toast.error(error.message || 'Failed to verify OTP. Please try again.');
+      console.error('Verify code error:', error);
+      toast.error(error.message || 'Failed to verify code. Please try again.');
     } finally {
       setIsLoading(false);
     }
