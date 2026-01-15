@@ -20,6 +20,7 @@ import BookServicePage from '@/pages/customer/BookServicePage';
 import GaragesPage from '@/pages/customer/GaragesPage';
 import RewardsPage from '@/pages/customer/RewardsPage';
 import WashPage from '@/pages/customer/WashPage';
+import CustomerProfilePage from '@/pages/customer/CustomerProfilePage';
 
 interface NavItem {
   label: string;
@@ -145,7 +146,7 @@ export default function CustomerLayout() {
           <Route path="/garages" element={<GaragesPage />} />
           <Route path="/history" element={<WashPage />} />
           <Route path="/rewards" element={<RewardsPage />} />
-          <Route path="/profile" element={<div>Profile Page Coming Soon</div>} />
+          <Route path="/profile" element={<CustomerProfilePage />} />
         </Routes>
       </main>
 
