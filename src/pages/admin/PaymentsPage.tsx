@@ -3,7 +3,7 @@ import { Smartphone, CheckCircle, Clock, TrendingUp } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { EmptyState, LoadingState } from '@/components/ui/empty-state';
-import { supabase } from '@/lib/Supabase';
+import { paymentsAPI } from '@/lib/api';
 import { toast } from 'sonner';
 
 interface Transaction {
@@ -11,13 +11,11 @@ interface Transaction {
   amount: number;
   status: string;
   payment_method: string;
-  reference: string;
-  booking?: {
-    id: string;
-    service?: {
-      name: string;
-    };
-  };
+  mpesa_receipt: string;
+  phone_number: string;
+  user_name?: string;
+  service_name?: string;
+  created_at: string;
 }
 
 export default function PaymentsPage() {
@@ -35,8 +33,8 @@ export default function PaymentsPage() {
 
   const fetchTransactions = async () => {
     try {
-      // Mock data - replace with actual API call when backend endpoint is ready
-      const data: Transaction[] = [];
+      const response = await paymentsAPI.getAll();
+      const data = response.data.payments || [];
       
       setTransactions(data);
       
@@ -88,16 +86,26 @@ export default function PaymentsPage() {
             />
           ) : (
             transactions.map((tx) => {
-              const serviceName = tx.booking?.service?.name || 'Service';
+              const serviceName = tx.service_name || 'Car Wash Service';
+              const userName = tx.user_name || 'Customer';
               return (
                 <div key={tx.id} className="flex items-center justify-between p-4 rounded-lg border border-border">
                   <div className="flex items-center gap-4">
                     <Smartphone className="h-6 w-6 text-success" />
-                    <div><p className="font-medium">{serviceName}</p><p className="text-sm text-muted-foreground">{tx.payment_method?.toUpperCase()} • {tx.reference}</p></div>
+                    <div>
+                      <p className="font-medium">{serviceName}</p>
+                      <p className="text-sm text-muted-foreground">
+                        {tx.payment_method?.toUpperCase()} • {tx.mpesa_receipt || tx.phone_number}
+                      </p>
+                      <p className="text-xs text-muted-foreground">{userName}</p>
+                    </div>
                   </div>
                   <div className="text-right">
                     <p className="font-bold">KES {tx.amount.toLocaleString()}</p>
-                    <Badge variant={tx.status === 'completed' ? 'success' : 'pending'}><CheckCircle className="h-3 w-3 mr-1" />{tx.status}</Badge>
+                    <Badge variant={tx.status === 'completed' ? 'success' : tx.status === 'failed' ? 'destructive' : 'warning'}>
+                      <CheckCircle className="h-3 w-3 mr-1" />
+                      {tx.status}
+                    </Badge>
                   </div>
                 </div>
               );
