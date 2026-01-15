@@ -48,13 +48,16 @@ export default function LoginPage() {
         
         if (selectedRole === 'customer') {
           toast.success('Account created! Let\'s get you started.');
+          navigate('/onboarding');
         } else if (selectedRole === 'detailer') {
-          toast.success('Account created! Complete your profile to get started.');
+          toast.success('Account created! Awaiting approval from car wash owner.');
+          navigate('/pending-approval');
+        } else if (selectedRole === 'admin') {
+          toast.success('Account created! Welcome to your business dashboard.');
+          navigate('/owner');
         } else {
-          toast.success('Account created! Set up your business profile.');
+          navigate('/onboarding');
         }
-        
-        navigate('/onboarding');
       } else {
         // Login
         if (!formData.email || !formData.password) {

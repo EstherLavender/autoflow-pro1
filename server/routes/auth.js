@@ -58,11 +58,15 @@ router.post('/register', async (req, res) => {
     }
 
     // Create system notification
+    const notificationMessage = role === 'detailer' 
+      ? 'Your account is pending approval from a car wash owner.'
+      : 'Your account is ready. Start using AutoFlow Pro!';
+    
     createNotification(
       user.id,
       'success',
       'Welcome to AutoFlow Pro!',
-      role === 'customer' ? 'Your account is ready. Start booking services now!' : 'Your account is pending approval.'
+      notificationMessage
     );
 
     // Generate token
