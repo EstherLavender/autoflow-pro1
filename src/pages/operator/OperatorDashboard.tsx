@@ -1,7 +1,6 @@
 import { useState, useEffect } from 'react';
 import { ClipboardList, Wallet, Clock } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import OperatorLayout from '@/components/layout/OperatorLayout';
 import { EmptyState, LoadingState } from '@/components/ui/empty-state';
 import { useAuth } from '@/context/AuthContext';
 
@@ -15,7 +14,7 @@ interface Job {
 }
 
 export default function OperatorDashboard() {
-  const { profile } = useAuth();
+  const { user } = useAuth();
   const [isLoading, setIsLoading] = useState(true);
   const [jobs, setJobs] = useState<Job[]>([]);
 
@@ -30,20 +29,22 @@ export default function OperatorDashboard() {
   }, []);
 
   if (isLoading) {
-    return (
-      <OperatorLayout title="My Jobs" subtitle="Today's assignments">
-        <LoadingState message="Loading jobs..." />
-      </OperatorLayout>
-    );
+    return <LoadingState message="Loading jobs..." />;
   }
 
   const activeJobs = jobs.filter(j => j.status === 'pending' || j.status === 'in_progress');
   const completedToday = jobs.filter(j => j.status === 'completed');
 
   return (
-    <OperatorLayout title="My Jobs" subtitle="Today's assignments">
+    <div className="space-y-6">
+      {/* Page Header */}
+      <div>
+        <h1 className="text-2xl font-bold text-foreground">My Jobs</h1>
+        <p className="text-muted-foreground mt-1">Today's assignments</p>
+      </div>
+
       {/* Stats */}
-      <div className="grid grid-cols-3 gap-4 mb-6">
+      <div className="grid grid-cols-3 gap-4">
         <Card>
           <CardContent className="pt-5">
             <ClipboardList className="h-5 w-5 text-muted-foreground mb-2" />
@@ -97,6 +98,6 @@ export default function OperatorDashboard() {
           )}
         </CardContent>
       </Card>
-    </OperatorLayout>
+    </div>
   );
 }
