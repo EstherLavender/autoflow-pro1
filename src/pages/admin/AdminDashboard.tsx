@@ -4,7 +4,6 @@ import { Users, CreditCard, AlertTriangle, CheckSquare, ArrowRight } from 'lucid
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import AdminLayout from '@/components/layout/AdminLayout';
 import { EmptyState, LoadingState } from '@/components/ui/empty-state';
 import { getPendingUsers } from '@/lib/userStore';
 import { User } from '@/types/auth';
@@ -26,11 +25,7 @@ export default function AdminDashboard() {
   }, []);
 
   if (isLoading) {
-    return (
-      <AdminLayout title="Dashboard" subtitle="Welcome back">
-        <LoadingState message="Loading dashboard..." />
-      </AdminLayout>
-    );
+    return <LoadingState message="Loading dashboard..." />;
   }
 
   const stats = [
@@ -47,9 +42,15 @@ export default function AdminDashboard() {
   ];
 
   return (
-    <AdminLayout title="Dashboard" subtitle="Welcome back">
+    <div className="space-y-6">
+      {/* Page Header */}
+      <div>
+        <h1 className="text-2xl md:text-3xl font-bold text-foreground">Dashboard</h1>
+        <p className="text-muted-foreground mt-1">Welcome back</p>
+      </div>
+
       {/* Stats Grid */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
         {stats.map((stat) => (
           <Card 
             key={stat.label} 
@@ -133,6 +134,6 @@ export default function AdminDashboard() {
           </CardContent>
         </Card>
       </div>
-    </AdminLayout>
+    </div>
   );
 }
