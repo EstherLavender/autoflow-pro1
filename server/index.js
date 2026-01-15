@@ -12,6 +12,7 @@ const userRoutes = require('./routes/users');
 const uploadRoutes = require('./routes/uploads');
 const notificationRoutes = require('./routes/notifications');
 const kycRoutes = require('./routes/kyc');
+const paymentRoutes = require('./routes/payments');
 
 const app = express();
 const PORT = process.env.PORT || 3001;
@@ -54,6 +55,7 @@ app.use('/api/users', userRoutes);
 app.use('/api/uploads', uploadRoutes);
 app.use('/api/notifications', notificationRoutes);
 app.use('/api/kyc', kycRoutes);
+app.use('/api/payments', paymentRoutes);
 
 // Health check
 app.get('/api/health', (req, res) => {

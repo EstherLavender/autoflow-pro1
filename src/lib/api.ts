@@ -101,4 +101,13 @@ export const notificationsAPI = {
   markAsRead: (id: string) => api.patch(`/notifications/${id}/read`),
 };
 
+// Payments APIs
+export const paymentsAPI = {
+  getAll: (params?: any) => api.get('/payments', { params }),
+  getById: (id: string) => api.get(`/payments/${id}`),
+  initiateSTKPush: (data: { phone: string; amount: number; booking_id?: string }) => 
+    api.post('/payments/mpesa/stkpush', data),
+  checkStatus: (checkoutRequestId: string) => api.get(`/payments/status/${checkoutRequestId}`),
+};
+
 export default api;
