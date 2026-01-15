@@ -1,48 +1,27 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Users, CreditCard, AlertTriangle, CheckSquare, ArrowRight } from 'lucide-react';
+import { Users, CreditCard, AlertTriangle, Wrench, ArrowRight } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
 import { EmptyState, LoadingState } from '@/components/ui/empty-state';
-import { usersAPI } from '@/lib/api';
-import { User } from '@/types/auth';
 
-export default function AdminDashboard() {
+export default function OwnerDashboard() {
   const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(true);
-  const [pendingUsers, setPendingUsers] = useState<User[]>([]);
 
   useEffect(() => {
-    loadPendingUsers();
+    // Load dashboard data
+    setIsLoading(false);
   }, []);
-
-  const loadPendingUsers = async () => {
-    try {
-      const response = await usersAPI.getPending();
-      setPendingUsers(response.data.users || []);
-    } catch (error) {
-      console.error('Error loading pending users:', error);
-    } finally {
-      setIsLoading(false);
-    }
-  };
 
   if (isLoading) {
     return <LoadingState message="Loading dashboard..." />;
   }
 
   const stats = [
-    { 
-      label: 'Pending Approvals', 
-      value: pendingUsers.length, 
-      icon: CheckSquare, 
-      href: '/admin/approvals',
-      variant: pendingUsers.length > 0 ? 'warning' : 'default'
-    },
-    { label: 'Active Users', value: 0, icon: Users, href: '/admin/users' },
-    { label: 'Transactions', value: 0, icon: CreditCard, href: '/admin/payments' },
-    { label: 'Open Disputes', value: 0, icon: AlertTriangle, href: '/admin/disputes' },
+    { label: 'Total Users', value: 0, icon: Users, href: '/owner/users', variant: 'default' },
+    { label: 'Active Services', value: 0, icon: Wrench, href: '/owner/services', variant: 'default' },
+    { label: 'Transactions', value: 0, icon: CreditCard, href: '/owner/payments', variant: 'default' },
+    { label: 'Open Disputes', value: 0, icon: AlertTriangle, href: '/owner/disputes', variant: 'default' },
   ];
 
   return (

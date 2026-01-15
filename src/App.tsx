@@ -11,6 +11,7 @@ import OnboardingRouter from './pages/onboarding/OnboardingRouter'
 
 // Role-specific layouts
 import AdminLayout from './components/layout/AdminLayout'
+import OwnerLayout from './components/layout/OwnerLayout'
 import OperatorLayout from './components/layout/OperatorLayout'
 import CustomerLayout from './components/layout/CustomerLayout'
 
@@ -31,6 +32,14 @@ function App() {
             element={
               <ProtectedRoute allowedRoles={['admin']}>
                 <AdminLayout />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/owner/*"
+            element={
+              <ProtectedRoute allowedRoles={['admin']}>
+                <OwnerLayout />
               </ProtectedRoute>
             }
           />

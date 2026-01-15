@@ -69,8 +69,16 @@ export default function LoginPage() {
         toast.success('Welcome back!');
         
         // Redirect based on user role
+        // Super admin (admin@autoflow.com) goes to /admin to approve users
+        // Car wash owners (role='admin' but not super admin) go to /owner
         if (user.role === 'admin') {
-          navigate('/admin');
+          // Check if this is the super admin
+          if (user.email === 'admin@autoflow.com') {
+            navigate('/admin');
+          } else {
+            // Regular car wash owner
+            navigate('/owner');
+          }
         } else if (user.role === 'detailer') {
           navigate('/operator');
         } else if (user.role === 'customer') {
