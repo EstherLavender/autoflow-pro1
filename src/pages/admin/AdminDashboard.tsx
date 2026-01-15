@@ -5,7 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { EmptyState, LoadingState } from '@/components/ui/empty-state';
-import { getPendingUsers } from '@/lib/userStore';
+import { usersAPI } from '@/lib/api';
 import { User } from '@/types/auth';
 
 export default function AdminDashboard() {
@@ -14,15 +14,19 @@ export default function AdminDashboard() {
   const [pendingUsers, setPendingUsers] = useState<User[]>([]);
 
   useEffect(() => {
-    // Simulate data loading
-    const timer = setTimeout(() => {
-      const pending = getPendingUsers();
-      setPendingUsers(pending);
-      setIsLoading(false);
-    }, 500);
-
-    return () => clearTimeout(timer);
+    loadPendingUsers();
   }, []);
+
+  const loadPendingUsers = async () => {
+    try {
+      const response = await usersAPI.getPending();
+      setPendingUsers(response.data.users || []);
+    } catch (error) {
+      console.error('Error loading pending users:', error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   if (isLoading) {
     return <LoadingState message="Loading dashboard..." />;

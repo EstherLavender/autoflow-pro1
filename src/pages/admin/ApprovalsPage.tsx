@@ -22,7 +22,8 @@ export default function ApprovalsPage() {
   const loadPendingUsers = async () => {
     try {
       const response = await usersAPI.getPending();
-      setPendingUsers(response.data || []);
+      console.log('Pending users response:', response.data);
+      setPendingUsers(response.data.users || []);
     } catch (error) {
       console.error('Error loading pending users:', error);
       toast.error('Failed to load pending approvals');
