@@ -211,19 +211,6 @@ export default function ApprovalsPage() {
           </CardContent>
         </Tabs>
       </Card>
-    </AdminLayout>
-  );
-}
-                        </div>
-                      </div>
-                    );
-                  })}
-                </div>
-              )}
-            </TabsContent>
-          </CardContent>
-        </Tabs>
-      </Card>
-    </AdminLayout>
+    </div>
   );
 }
