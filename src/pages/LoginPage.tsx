@@ -63,10 +63,23 @@ export default function LoginPage() {
           return;
         }
 
-        await signIn(formData.email, formData.password);
+        const response = await signIn(formData.email, formData.password);
         toast.success('Welcome back!');
         
-        // Navigation is handled by the router based on user role
+        // Get the user from localStorage after login
+        const userData = JSON.parse(localStorage.getItem('user') || '{}');
+        const userRole = userData.role;
+        
+        // Redirect based on user role
+        if (userRole === 'admin') {
+          navigate('/admin');
+        } else if (userRole === 'detailer') {
+          navigate('/operator');
+        } else if (userRole === 'customer') {
+          navigate('/customer');
+        } else {
+          navigate('/');
+        }
       }
     } catch (error: any) {
       const errorMessage = error.response?.data?.error || error.message || 'Something went wrong';
