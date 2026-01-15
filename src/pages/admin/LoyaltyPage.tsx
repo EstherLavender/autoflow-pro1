@@ -3,7 +3,6 @@ import { Gift, Sparkles, Award, Users } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
-import AdminLayout from '@/components/layout/AdminLayout';
 import { EmptyState, LoadingState } from '@/components/ui/empty-state';
 import { supabase } from '@/lib/Supabase';
 import { toast } from 'sonner';
@@ -37,11 +36,7 @@ export default function LoyaltyPage() {
   };
 
   if (isLoading) {
-    return (
-      <AdminLayout title="Loyalty Program" subtitle="10th wash is FREE!">
-        <LoadingState message="Loading loyalty data..." />
-      </AdminLayout>
-    );
+    return <LoadingState message="Loading loyalty data..." />;
   }
 
   const visitsForFree = config.visitsForFreeWash;
@@ -49,7 +44,12 @@ export default function LoyaltyPage() {
   const totalVisits = loyalty.reduce((sum, l) => sum + l.visits, 0);
 
   return (
-    <AdminLayout title="Loyalty Program" subtitle="10th wash is FREE!">
+    <div className="space-y-6">
+      <div>
+        <h1 className="text-2xl md:text-3xl font-bold text-foreground">Loyalty Program</h1>
+        <p className="text-muted-foreground mt-1">10th wash is FREE!</p>
+      </div>
+
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
         <Card><CardContent className="pt-5"><Users className="h-4 w-4 text-muted-foreground mb-1" /><p className="text-2xl font-bold">{totalMembers}</p><p className="text-sm text-muted-foreground">Members</p></CardContent></Card>
         <Card><CardContent className="pt-5"><Sparkles className="h-4 w-4 text-accent mb-1" /><p className="text-2xl font-bold">{totalVisits}</p><p className="text-sm text-muted-foreground">Total Visits</p></CardContent></Card>
@@ -93,6 +93,6 @@ export default function LoyaltyPage() {
           )}
         </CardContent>
       </Card>
-    </AdminLayout>
+    </div>
   );
 }

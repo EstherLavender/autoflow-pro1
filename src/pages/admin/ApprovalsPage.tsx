@@ -4,7 +4,6 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import AdminLayout from '@/components/layout/AdminLayout';
 import { usersAPI } from '@/lib/api';
 import { toast } from 'sonner';
 
@@ -53,10 +52,12 @@ export default function ApprovalsPage() {
   const totalPending = pendingUsers.length;
 
   return (
-    <AdminLayout 
-      title="Approvals" 
-      subtitle="Review and approve pending accounts"
-    >
+    <div className="space-y-6">
+      <div>
+        <h1 className="text-2xl md:text-3xl font-bold text-foreground">Approvals</h1>
+        <p className="text-muted-foreground mt-1">Review and approve pending accounts</p>
+      </div>
+
       {/* Summary */}
       <div className="grid grid-cols-2 gap-4 mb-6">
         <Card>

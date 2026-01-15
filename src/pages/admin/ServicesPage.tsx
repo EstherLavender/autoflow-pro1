@@ -3,7 +3,6 @@ import { Plus, Edit, Trash2, Droplets, Wrench, Package, Settings } from 'lucide-
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import AdminLayout from '@/components/layout/AdminLayout';
 import { EmptyState, LoadingState } from '@/components/ui/empty-state';
 import { servicesAPI } from '@/lib/api';
 import { toast } from 'sonner';
@@ -55,15 +54,16 @@ export default function ServicesPage() {
   };
 
   if (isLoading) {
-    return (
-      <AdminLayout title="Services" subtitle="Manage your service types and pricing">
-        <LoadingState message="Loading services..." />
-      </AdminLayout>
-    );
+    return <LoadingState message="Loading services..." />;
   }
 
   return (
-    <AdminLayout title="Services" subtitle="Manage your service types and pricing">
+    <div className="space-y-6">
+      <div>
+        <h1 className="text-2xl md:text-3xl font-bold text-foreground">Services</h1>
+        <p className="text-muted-foreground mt-1">Manage your service types and pricing</p>
+      </div>
+
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
         <div className="flex gap-2 flex-wrap">
           <Badge variant="secondary" className="cursor-pointer">All</Badge>
@@ -132,6 +132,6 @@ export default function ServicesPage() {
         })}
         </div>
       )}
-    </AdminLayout>
+    </div>
   );
 }

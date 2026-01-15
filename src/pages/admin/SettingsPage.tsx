@@ -3,14 +3,18 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
-import AdminLayout from '@/components/layout/AdminLayout';
 import { useAuth } from '@/context/AuthContext';
 
 export default function SettingsPage() {
   const { user } = useAuth();
 
   return (
-    <AdminLayout title="Settings" subtitle="Manage your account">
+    <div className="space-y-6">
+      <div>
+        <h1 className="text-2xl md:text-3xl font-bold text-foreground">Settings</h1>
+        <p className="text-muted-foreground mt-1">Manage your account</p>
+      </div>
+
       <div className="max-w-2xl space-y-6">
         {/* Account Settings */}
         <Card>
@@ -55,6 +59,6 @@ export default function SettingsPage() {
           </CardContent>
         </Card>
       </div>
-    </AdminLayout>
+    </div>
   );
 }

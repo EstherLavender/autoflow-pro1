@@ -5,7 +5,6 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Progress } from '@/components/ui/progress';
-import AdminLayout from '@/components/layout/AdminLayout';
 import { EmptyState, LoadingState } from '@/components/ui/empty-state';
 import { supabase } from '@/lib/Supabase';
 import { toast } from 'sonner';
@@ -44,15 +43,16 @@ export default function InventoryPage() {
   const totalValue = items.reduce((sum, i) => sum + (i.quantity * i.cost_per_unit), 0);
 
   if (isLoading) {
-    return (
-      <AdminLayout title="Inventory" subtitle="Track parts and consumables">
-        <LoadingState message="Loading inventory..." />
-      </AdminLayout>
-    );
+    return <LoadingState message="Loading inventory..." />;
   }
 
   return (
-    <AdminLayout title="Inventory" subtitle="Track parts and consumables">
+    <div className="space-y-6">
+      <div>
+        <h1 className="text-2xl md:text-3xl font-bold text-foreground">Inventory</h1>
+        <p className="text-muted-foreground mt-1">Track parts and consumables</p>
+      </div>
+
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
         <Card>
           <CardContent className="pt-5">
@@ -118,6 +118,6 @@ export default function InventoryPage() {
           </table>
         </div>
       </Card>
-    </AdminLayout>
+    </div>
   );
 }

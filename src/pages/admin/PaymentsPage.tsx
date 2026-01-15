@@ -2,7 +2,6 @@ import { useState, useEffect } from 'react';
 import { Smartphone, CheckCircle, Clock, TrendingUp } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import AdminLayout from '@/components/layout/AdminLayout';
 import { EmptyState, LoadingState } from '@/components/ui/empty-state';
 import { supabase } from '@/lib/Supabase';
 import { toast } from 'sonner';
@@ -56,15 +55,16 @@ export default function PaymentsPage() {
   };
 
   if (isLoading) {
-    return (
-      <AdminLayout title="Payments" subtitle="Track M-Pesa transactions">
-        <LoadingState message="Loading payments..." />
-      </AdminLayout>
-    );
+    return <LoadingState message="Loading payments..." />;
   }
 
   return (
-    <AdminLayout title="Payments" subtitle="Track M-Pesa transactions">
+    <div className="space-y-6">
+      <div>
+        <h1 className="text-2xl md:text-3xl font-bold text-foreground">Payments</h1>
+        <p className="text-muted-foreground mt-1">Track M-Pesa transactions</p>
+      </div>
+
       <div className="grid grid-cols-2 lg:grid-cols-3 gap-4 mb-6">
         <Card variant="success"><CardContent className="pt-5"><TrendingUp className="h-4 w-4 text-success mb-1" /><p className="text-2xl font-bold">KES {stats.totalRevenue.toLocaleString()}</p><p className="text-sm text-muted-foreground">Total Revenue</p></CardContent></Card>
         <Card variant="warning"><CardContent className="pt-5"><Clock className="h-4 w-4 text-warning mb-1" /><p className="text-2xl font-bold">KES {stats.pendingAmount.toLocaleString()}</p><p className="text-sm text-muted-foreground">Pending</p></CardContent></Card>
@@ -100,6 +100,6 @@ export default function PaymentsPage() {
           )}
         </CardContent>
       </Card>
-    </AdminLayout>
+    </div>
   );
 }

@@ -3,7 +3,6 @@ import { Users, Search } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
-import AdminLayout from '@/components/layout/AdminLayout';
 import { EmptyState, LoadingState } from '@/components/ui/empty-state';
 import { getUsers } from '@/lib/userStore';
 import { User } from '@/types/auth';
@@ -29,15 +28,16 @@ export default function UsersPage() {
   );
 
   if (isLoading) {
-    return (
-      <AdminLayout title="Users" subtitle="Manage active users">
-        <LoadingState message="Loading users..." />
-      </AdminLayout>
-    );
+    return <LoadingState message="Loading users..." />;
   }
 
   return (
-    <AdminLayout title="Users" subtitle="Manage active users">
+    <div className="space-y-6">
+      <div>
+        <h1 className="text-2xl md:text-3xl font-bold text-foreground">Users</h1>
+        <p className="text-muted-foreground mt-1">Manage active users</p>
+      </div>
+
       {/* Search */}
       <div className="mb-6">
         <div className="relative max-w-md">
@@ -102,6 +102,6 @@ export default function UsersPage() {
           )}
         </CardContent>
       </Card>
-    </AdminLayout>
+    </div>
   );
 }
