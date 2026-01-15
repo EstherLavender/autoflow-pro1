@@ -58,6 +58,9 @@
     --shadow-sm: 0 1px 2px 0 hsl(220 17% 4% / 0.5);
     --shadow-md: 0 4px 6px -1px hsl(220 17% 4% / 0.5);
     --shadow-lg: 0 10px 15px -3px hsl(220 17% 4% / 0.5);
+
+    /* Hero gradient with background image */
+    --gradient-hero: linear-gradient(135deg, rgba(11, 13, 16, 0.95) 0%, rgba(26, 29, 35, 0.9) 50%, rgba(11, 13, 16, 0.95) 100%);
   }
 
   /* Light mode override (optional) */

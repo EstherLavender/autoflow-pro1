@@ -37,9 +37,9 @@ export default function LandingPage() {
   const navigate = useNavigate();
 
   return (
-    <div className="min-h-screen" style={{ background: 'var(--gradient-hero)' }}>
+    <div className="min-h-screen">
       {/* Header */}
-      <header className="container py-4">
+      <header className="container py-4" style={{ background: 'var(--gradient-hero)' }}>
         <nav className="flex items-center justify-between">
           <div className="flex items-center gap-2">
             <div className="h-10 w-10 rounded-xl bg-primary flex items-center justify-center shadow-glow">
@@ -58,8 +58,26 @@ export default function LandingPage() {
         </nav>
       </header>
 
-      {/* Hero */}
-      <section className="container pt-16 pb-24">
+      {/* Hero Section with Background Image */}
+      <section className="relative overflow-hidden" style={{ background: 'var(--gradient-hero)' }}>
+        {/* Hero Background Image with Lazy Loading */}
+        <div className="absolute inset-0 z-0">
+          <img 
+            src="/herobg.JPG" 
+            alt="Car wash background"
+            loading="lazy"
+            className="w-full h-full object-cover"
+            style={{ objectPosition: 'center' }}
+          />
+          {/* Dark overlay for text readability */}
+          <div 
+            className="absolute inset-0" 
+            style={{ background: 'var(--gradient-hero)' }}
+          />
+        </div>
+        
+        {/* Hero Content */}
+        <div className="container pt-16 pb-24 relative z-10">
         <div className="max-w-4xl mx-auto text-center">
           <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 text-primary text-sm font-medium mb-6 animate-fade-in">
             <Sparkles className="h-4 w-4" />
@@ -208,6 +226,7 @@ export default function LandingPage() {
           </div>
         </div>
       </footer>
+      </div>
     </div>
   );
 }
