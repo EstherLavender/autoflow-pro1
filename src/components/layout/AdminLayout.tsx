@@ -1,5 +1,4 @@
-import { ReactNode } from 'react';
-import { Link, useLocation, useNavigate } from 'react-router-dom';
+import { Routes, Route, Link, useLocation, useNavigate } from 'react-router-dom';
 import { 
   LayoutDashboard, 
   Users, 
@@ -19,6 +18,14 @@ import { useState, useEffect } from 'react';
 import { cn } from '@/lib/utils';
 import { getPendingUsers } from '@/lib/userStore';
 
+// Import admin pages
+import AdminDashboard from '@/pages/admin/AdminDashboard';
+import ApprovalsPage from '@/pages/admin/ApprovalsPage';
+import UsersPage from '@/pages/admin/UsersPage';
+import PaymentsPage from '@/pages/admin/PaymentsPage';
+import DisputesPage from '@/pages/admin/DisputesPage';
+import SettingsPage from '@/pages/admin/SettingsPage';
+
 interface NavItem {
   label: string;
   icon: typeof LayoutDashboard;
@@ -26,14 +33,10 @@ interface NavItem {
   badge?: number;
 }
 
-export default function AdminLayout({ children, title, subtitle }: {
-  children: ReactNode;
-  title: string;
-  subtitle?: string;
-}) {
+export default function AdminLayout() {
   const location = useLocation();
   const navigate = useNavigate();
-  const { user, logout } = useAuth();
+  const { user, signOut } = useAuth();
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [pendingCount, setPendingCount] = useState(0);
 
@@ -51,8 +54,8 @@ export default function AdminLayout({ children, title, subtitle }: {
     { label: 'Settings', icon: Settings, href: '/admin/settings' },
   ];
 
-  const handleLogout = () => {
-    logout();
+  const handleLogout = async () => {
+    await signOut();
     navigate('/');
   };
 
@@ -161,14 +164,14 @@ export default function AdminLayout({ children, title, subtitle }: {
       {/* Main Content */}
       <main className="lg:ml-64">
         <div className="p-4 md:p-6 lg:p-8">
-          {/* Page Header */}
-          <div className="mb-6">
-            <h1 className="text-2xl md:text-3xl font-bold text-foreground">{title}</h1>
-            {subtitle && <p className="text-muted-foreground mt-1">{subtitle}</p>}
-          </div>
-
-          {/* Page Content */}
-          {children}
+          <Routes>
+            <Route path="/" element={<AdminDashboard />} />
+            <Route path="/approvals" element={<ApprovalsPage />} />
+            <Route path="/users" element={<UsersPage />} />
+            <Route path="/payments" element={<PaymentsPage />} />
+            <Route path="/disputes" element={<DisputesPage />} />
+            <Route path="/settings" element={<SettingsPage />} />
+          </Routes>
         </div>
       </main>
     </div>
