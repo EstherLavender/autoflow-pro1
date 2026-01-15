@@ -11,20 +11,26 @@ const router = express.Router();
 router.post('/register', async (req, res) => {
   try {
     const { email, password, role, full_name, phone } = req.body;
+    
+    console.log('Registration attempt:', { email, role, full_name, phone, hasPassword: !!password });
 
     // Validate input
     if (!email || !password || !role) {
+      console.log('Validation failed - missing required fields');
       return res.status(400).json({ error: 'Email, password, and role are required' });
     }
 
     // Check if user exists
     const userCheck = await pool.query('SELECT * FROM users WHERE email = $1', [email]);
     if (userCheck.rows.length > 0) {
+      console.log('User already exists:', email);
       return res.status(400).json({ error: 'User already exists' });
     }
 
     // Hash password
     const hashedPassword = await bcrypt.hash(password, 10);
+    
+    console.log('Creating user...');
 
     // Create user
     const result = await pool.query(
@@ -35,12 +41,18 @@ router.post('/register', async (req, res) => {
     );
 
     const user = result.rows[0];
+    console.log('User created:', user.id);
 
     // Send welcome email
-    await sendEmail(user.email, 'registration', {
-      userName: user.full_name || user.email,
-      userRole: role
-    });
+    try {
+      await sendEmail(user.email, 'registration', {
+        userName: user.full_name || user.email,
+        userRole: role
+      });
+      console.log('Welcome email sent');
+    } catch (emailError) {
+      console.error('Email send failed (non-critical):', emailError.message);
+    }
 
     // Create system notification
     createNotification(
@@ -57,6 +69,7 @@ router.post('/register', async (req, res) => {
       { expiresIn: process.env.JWT_EXPIRES_IN }
     );
 
+    console.log('Registration successful');
     res.status(201).json({
       message: 'User registered successfully',
       token,
@@ -79,28 +92,37 @@ router.post('/register', async (req, res) => {
 router.post('/login', async (req, res) => {
   try {
     const { email, password } = req.body;
+    
+    console.log('Login attempt:', { email, hasPassword: !!password });
 
     // Validate input
     if (!email || !password) {
+      console.log('Validation failed - missing credentials');
       return res.status(400).json({ error: 'Email and password are required' });
     }
 
     // Get user
     const result = await pool.query('SELECT * FROM users WHERE email = $1', [email]);
     if (result.rows.length === 0) {
+      console.log('User not found:', email);
       return res.status(401).json({ error: 'Invalid credentials' });
     }
 
     const user = result.rows[0];
+    console.log('User found:', { id: user.id, email: user.email, role: user.role, status: user.status });
 
     // Check password
     const validPassword = await bcrypt.compare(password, user.password);
     if (!validPassword) {
+      console.log('Invalid password for:', email);
       return res.status(401).json({ error: 'Invalid credentials' });
     }
 
+    console.log('Password valid');
+
     // Check if user is suspended
     if (user.status === 'suspended') {
+      console.log('User suspended:', email);
       return res.status(403).json({ error: 'Account suspended. Contact administrator.' });
     }
 
@@ -111,6 +133,7 @@ router.post('/login', async (req, res) => {
       { expiresIn: process.env.JWT_EXPIRES_IN }
     );
 
+    console.log('Login successful');
     res.json({
       message: 'Login successful',
       token,

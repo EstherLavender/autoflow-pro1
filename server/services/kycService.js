@@ -612,11 +612,19 @@ class KYCService {
     );
     
     if (profileCheck.rows.length === 0) {
+      // Get user details to create profile
+      const userDetails = await pool.query(
+        'SELECT full_name, phone FROM users WHERE id = $1',
+        [verification.user_id]
+      );
+      const userName = userDetails.rows[0]?.full_name || 'User';
+      const userPhone = userDetails.rows[0]?.phone || '';
+      
       // Create basic KYC profile if it doesn't exist
       await pool.query(
-        `INSERT INTO kyc_profiles (user_id, email_verified, kyc_status) 
-         VALUES ($1, true, 'incomplete')`,
-        [verification.user_id]
+        `INSERT INTO kyc_profiles (user_id, full_name, phone_verified, email_verified, kyc_status) 
+         VALUES ($1, $2, false, true, 'incomplete')`,
+        [verification.user_id, userName]
       );
     } else {
       // Update existing profile
