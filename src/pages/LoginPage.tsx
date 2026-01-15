@@ -79,9 +79,6 @@ export default function LoginPage() {
           navigate('/');
         }
       }
-          navigate('/');
-        }
-      }
     } catch (error: any) {
       const errorMessage = error.response?.data?.error || error.message || 'Something went wrong';
       toast.error(errorMessage);
