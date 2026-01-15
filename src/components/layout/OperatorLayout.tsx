@@ -1,5 +1,4 @@
-import { ReactNode } from 'react';
-import { Link, useLocation, useNavigate } from 'react-router-dom';
+import { Routes, Route, Link, useLocation, useNavigate } from 'react-router-dom';
 import { 
   Car,
   LogOut,
@@ -14,6 +13,11 @@ import { useAuth } from '@/context/AuthContext';
 import { useState } from 'react';
 import { cn } from '@/lib/utils';
 
+// Import operator pages
+import OperatorDashboard from '@/pages/operator/OperatorDashboard';
+import OperatorEarningsPage from '@/pages/operator/OperatorEarningsPage';
+import OperatorProfilePage from '@/pages/operator/OperatorProfilePage';
+
 interface NavItem {
   label: string;
   icon: typeof ClipboardList;
@@ -26,20 +30,14 @@ const navItems: NavItem[] = [
   { label: 'Profile', icon: User, href: '/operator/profile' },
 ];
 
-interface OperatorLayoutProps {
-  children: ReactNode;
-  title: string;
-  subtitle?: string;
-}
-
-export default function OperatorLayout({ children, title, subtitle }: OperatorLayoutProps) {
+export default function OperatorLayout() {
   const location = useLocation();
   const navigate = useNavigate();
-  const { user, logout } = useAuth();
+  const { user, signOut } = useAuth();
   const [menuOpen, setMenuOpen] = useState(false);
 
-  const handleLogout = () => {
-    logout();
+  const handleLogout = async () => {
+    await signOut();
     navigate('/');
   };
 
@@ -127,14 +125,11 @@ export default function OperatorLayout({ children, title, subtitle }: OperatorLa
 
       {/* Main Content */}
       <main className="container py-6">
-        {/* Page Header */}
-        <div className="mb-6">
-          <h1 className="text-2xl font-bold text-foreground">{title}</h1>
-          {subtitle && <p className="text-muted-foreground mt-1">{subtitle}</p>}
-        </div>
-
-        {/* Page Content */}
-        {children}
+        <Routes>
+          <Route path="/" element={<OperatorDashboard />} />
+          <Route path="/earnings" element={<OperatorEarningsPage />} />
+          <Route path="/profile" element={<OperatorProfilePage />} />
+        </Routes>
       </main>
     </div>
   );
