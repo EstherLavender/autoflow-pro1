@@ -90,7 +90,7 @@ export default function AdminDashboard() {
 
       {/* Stats Grid */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-        {stats.map((stat) => (
+        {dashboardStats.map((stat) => (
           <Card 
             key={stat.label} 
             className="cursor-pointer hover:border-primary/50 transition-colors"
