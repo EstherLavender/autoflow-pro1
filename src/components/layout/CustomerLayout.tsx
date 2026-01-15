@@ -1,5 +1,4 @@
-import { ReactNode } from 'react';
-import { Link, useLocation, useNavigate } from 'react-router-dom';
+import { Routes, Route, Link, useLocation, useNavigate } from 'react-router-dom';
 import { 
   Droplets,
   LogOut,
@@ -15,6 +14,13 @@ import { useAuth } from '@/context/AuthContext';
 import { useState } from 'react';
 import { cn } from '@/lib/utils';
 
+// Import customer pages
+import CustomerDashboard from '@/pages/customer/CustomerDashboard';
+import BookServicePage from '@/pages/customer/BookServicePage';
+import GaragesPage from '@/pages/customer/GaragesPage';
+import RewardsPage from '@/pages/customer/RewardsPage';
+import WashPage from '@/pages/customer/WashPage';
+
 interface NavItem {
   label: string;
   icon: typeof Home;
@@ -28,20 +34,14 @@ const navItems: NavItem[] = [
   { label: 'Profile', icon: User, href: '/customer/profile' },
 ];
 
-interface CustomerLayoutProps {
-  children: ReactNode;
-  title: string;
-  subtitle?: string;
-}
-
-export default function CustomerLayout({ children, title, subtitle }: CustomerLayoutProps) {
+export default function CustomerLayout() {
   const location = useLocation();
   const navigate = useNavigate();
-  const { user, logout } = useAuth();
+  const { user, signOut } = useAuth();
   const [menuOpen, setMenuOpen] = useState(false);
 
-  const handleLogout = () => {
-    logout();
+  const handleLogout = async () => {
+    await signOut();
     navigate('/');
   };
 
