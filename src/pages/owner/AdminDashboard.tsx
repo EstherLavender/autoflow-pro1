@@ -29,7 +29,7 @@ export default function OwnerDashboard() {
       {/* Page Header */}
       <div>
         <h1 className="text-2xl md:text-3xl font-bold text-foreground">Dashboard</h1>
-        <p className="text-muted-foreground mt-1">Welcome back</p>
+        <p className="text-muted-foreground mt-1">Manage your car wash business</p>
       </div>
 
       {/* Stats Grid */}
@@ -43,9 +43,6 @@ export default function OwnerDashboard() {
             <CardContent className="pt-5">
               <div className="flex items-center justify-between mb-2">
                 <stat.icon className="h-5 w-5 text-muted-foreground" />
-                {stat.variant === 'warning' && stat.value > 0 && (
-                  <Badge variant="destructive" className="text-xs">{stat.value} new</Badge>
-                )}
               </div>
               <p className="text-2xl font-bold text-foreground">{stat.value}</p>
               <p className="text-sm text-muted-foreground">{stat.label}</p>
@@ -56,49 +53,18 @@ export default function OwnerDashboard() {
 
       {/* Quick Actions */}
       <div className="grid md:grid-cols-2 gap-6">
-        {/* Pending Approvals Card */}
+        {/* Services Card */}
         <Card>
-          <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-lg font-semibold">Pending Approvals</CardTitle>
-            {pendingUsers.length > 0 && (
-              <Button variant="ghost" size="sm" onClick={() => navigate('/admin/approvals')}>
-                View All <ArrowRight className="h-4 w-4 ml-1" />
-              </Button>
-            )}
+          <CardHeader>
+            <CardTitle className="text-lg font-semibold">Active Services</CardTitle>
           </CardHeader>
           <CardContent>
-            {pendingUsers.length === 0 ? (
-              <EmptyState
-                icon={CheckSquare}
-                title="No pending approvals"
-                description="All user registrations have been reviewed."
-                className="py-8"
-              />
-            ) : (
-              <div className="space-y-3">
-                {pendingUsers.slice(0, 3).map((user) => (
-                  <div 
-                    key={user.id} 
-                    className="flex items-center justify-between p-3 rounded-lg border border-border"
-                  >
-                    <div className="flex items-center gap-3">
-                      <div className="h-10 w-10 rounded-full bg-muted flex items-center justify-center">
-                        <span className="text-sm font-semibold text-foreground">
-                          {user.email?.charAt(0).toUpperCase() || 'U'}
-                        </span>
-                      </div>
-                      <div>
-                        <p className="font-medium text-sm text-foreground">
-                          {user.email || user.phone}
-                        </p>
-                        <p className="text-xs text-muted-foreground capitalize">{user.role}</p>
-                      </div>
-                    </div>
-                    <Badge variant="outline">Pending</Badge>
-                  </div>
-                ))}
-              </div>
-            )}
+            <EmptyState
+              icon={Wrench}
+              title="No active services"
+              description="Add services to start accepting bookings from customers."
+              className="py-8"
+            />
           </CardContent>
         </Card>
 

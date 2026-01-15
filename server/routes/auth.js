@@ -33,11 +33,14 @@ router.post('/register', async (req, res) => {
     console.log('Creating user...');
 
     // Create user
+    // Only detailers need approval, customers and car owners (admin) are active immediately
+    const status = role === 'detailer' ? 'pending' : 'active';
+    
     const result = await pool.query(
       `INSERT INTO users (email, password, role, full_name, phone, status, created_at, updated_at) 
        VALUES ($1, $2, $3, $4, $5, $6, NOW(), NOW()) 
        RETURNING id, email, role, full_name, phone, status, created_at`,
-      [email, hashedPassword, role, full_name, phone, role === 'customer' ? 'active' : 'pending']
+      [email, hashedPassword, role, full_name, phone, status]
     );
 
     const user = result.rows[0];
