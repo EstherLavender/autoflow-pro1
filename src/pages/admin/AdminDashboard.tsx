@@ -5,24 +5,59 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { EmptyState, LoadingState } from '@/components/ui/empty-state';
-import { usersAPI } from '@/lib/api';
+import { usersAPI, paymentsAPI, bookingsAPI } from '@/lib/api';
 import { User } from '@/types/auth';
+
+interface DashboardStats {
+  pendingUsers: number;
+  activeUsers: number;
+  totalTransactions: number;
+  openDisputes: number;
+}
 
 export default function AdminDashboard() {
   const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(true);
   const [pendingUsers, setPendingUsers] = useState<User[]>([]);
+  const [stats, setStats] = useState<DashboardStats>({
+    pendingUsers: 0,
+    activeUsers: 0,
+    totalTransactions: 0,
+    openDisputes: 0,
+  });
 
   useEffect(() => {
-    loadPendingUsers();
+    loadDashboardData();
   }, []);
 
-  const loadPendingUsers = async () => {
+  const loadDashboardData = async () => {
     try {
-      const response = await usersAPI.getPending();
-      setPendingUsers(response.data.users || []);
+      // Load pending users
+      const pendingResponse = await usersAPI.getPending();
+      const pending = pendingResponse.data.users || [];
+      setPendingUsers(pending);
+
+      // Load user stats
+      const statsResponse = await usersAPI.getStats();
+      const userStats = statsResponse.data.stats;
+
+      // Load payments count
+      const paymentsResponse = await paymentsAPI.getAll();
+      const payments = paymentsResponse.data.payments || [];
+
+      // Load bookings to count disputes (bookings with status 'disputed')
+      const bookingsResponse = await bookingsAPI.getAll();
+      const bookings = bookingsResponse.data.bookings || [];
+      const disputes = bookings.filter((b: any) => b.status === 'disputed').length;
+
+      setStats({
+        pendingUsers: pending.length,
+        activeUsers: parseInt(userStats.active_count) || 0,
+        totalTransactions: payments.length,
+        openDisputes: disputes,
+      });
     } catch (error) {
-      console.error('Error loading pending users:', error);
+      console.error('Error loading dashboard data:', error);
     } finally {
       setIsLoading(false);
     }
@@ -32,17 +67,17 @@ export default function AdminDashboard() {
     return <LoadingState message="Loading dashboard..." />;
   }
 
-  const stats = [
+  const dashboardStats = [
     { 
       label: 'Pending Approvals', 
-      value: pendingUsers.length, 
+      value: stats.pendingUsers, 
       icon: CheckSquare, 
       href: '/admin/approvals',
-      variant: pendingUsers.length > 0 ? 'warning' : 'default'
+      variant: stats.pendingUsers > 0 ? 'warning' : 'default'
     },
-    { label: 'Active Users', value: 0, icon: Users, href: '/admin/users' },
-    { label: 'Transactions', value: 0, icon: CreditCard, href: '/admin/payments' },
-    { label: 'Open Disputes', value: 0, icon: AlertTriangle, href: '/admin/disputes' },
+    { label: 'Active Users', value: stats.activeUsers, icon: Users, href: '/admin/users' },
+    { label: 'Transactions', value: stats.totalTransactions, icon: CreditCard, href: '/admin/payments' },
+    { label: 'Open Disputes', value: stats.openDisputes, icon: AlertTriangle, href: '/admin/disputes' },
   ];
 
   return (
