@@ -4,7 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { EmptyState, LoadingState } from '@/components/ui/empty-state';
-import { getUsers } from '@/lib/userStore';
+import { usersAPI } from '@/lib/api';
 import { User } from '@/types/auth';
 
 export default function UsersPage() {
@@ -13,14 +13,19 @@ export default function UsersPage() {
   const [searchQuery, setSearchQuery] = useState('');
 
   useEffect(() => {
-    const timer = setTimeout(() => {
-      const allUsers = getUsers().filter(u => u.status === 'active');
-      setUsers(allUsers);
-      setIsLoading(false);
-    }, 500);
-
-    return () => clearTimeout(timer);
+    loadUsers();
   }, []);
+
+  const loadUsers = async () => {
+    try {
+      const response = await usersAPI.getAll({ status: 'active' });
+      setUsers(response.data.users || []);
+    } catch (error) {
+      console.error('Error loading users:', error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   const filteredUsers = users.filter(user => 
     user.email?.toLowerCase().includes(searchQuery.toLowerCase()) ||
