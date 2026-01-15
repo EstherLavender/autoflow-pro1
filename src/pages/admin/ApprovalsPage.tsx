@@ -7,8 +7,16 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { usersAPI } from '@/lib/api';
 import { toast } from 'sonner';
 
+interface PendingUser {
+  id: string;
+  email: string;
+  role: string;
+  full_name?: string;
+  phone?: string;
+}
+
 export default function ApprovalsPage() {
-  const [pendingUsers, setPendingUsers] = useState<any[]>([]);
+  const [pendingUsers, setPendingUsers] = useState<PendingUser[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
   const loadPendingUsers = async () => {
