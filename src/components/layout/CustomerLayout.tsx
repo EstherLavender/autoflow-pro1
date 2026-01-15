@@ -139,14 +139,14 @@ export default function CustomerLayout() {
 
       {/* Main Content */}
       <main className="container py-6">
-        {/* Page Header */}
-        <div className="mb-6">
-          <h1 className="text-2xl font-bold text-foreground">{title}</h1>
-          {subtitle && <p className="text-muted-foreground mt-1">{subtitle}</p>}
-        </div>
-
-        {/* Page Content */}
-        {children}
+        <Routes>
+          <Route path="/" element={<CustomerDashboard />} />
+          <Route path="/book" element={<BookServicePage />} />
+          <Route path="/garages" element={<GaragesPage />} />
+          <Route path="/history" element={<WashPage />} />
+          <Route path="/rewards" element={<RewardsPage />} />
+          <Route path="/profile" element={<div>Profile Page Coming Soon</div>} />
+        </Routes>
       </main>
 
       {/* Mobile Bottom Navigation */}
