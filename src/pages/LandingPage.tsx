@@ -118,10 +118,11 @@ export default function LandingPage() {
             </div>
           ))}
         </div>
+        </div>
       </section>
 
       {/* Services Preview */}
-      <section className="container pb-24">
+      <section className="container pb-24" style={{ background: 'var(--background)' }}>
         <div className="grid md:grid-cols-3 gap-6 max-w-4xl mx-auto">
           {[
             { icon: Droplets, title: 'Basic Wash', desc: 'Quick exterior wash - KES 300', price: 300 },
