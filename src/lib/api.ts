@@ -33,8 +33,8 @@ api.interceptors.response.use(
 
 // Auth APIs
 export const authAPI = {
-  register: (data: any) => api.post('/auth/register', data),
-  login: (data: any) => api.post('/auth/login', data),
+  register: (data: Record<string, unknown>) => api.post('/auth/register', data),
+  login: (data: Record<string, unknown>) => api.post('/auth/login', data),
   me: () => api.get('/auth/me'),
   logout: () => api.post('/auth/logout'),
 };
@@ -43,8 +43,8 @@ export const authAPI = {
 export const servicesAPI = {
   getAll: () => api.get('/services'),
   getById: (id: string) => api.get(`/services/${id}`),
-  create: (data: any) => api.post('/services', data),
-  update: (id: string, data: any) => api.put(`/services/${id}`, data),
+  create: (data: Record<string, unknown>) => api.post('/services', data),
+  update: (id: string, data: Record<string, unknown>) => api.put(`/services/${id}`, data),
   delete: (id: string) => api.delete(`/services/${id}`),
 };
 
@@ -52,7 +52,7 @@ export const servicesAPI = {
 export const bookingsAPI = {
   getAll: () => api.get('/bookings'),
   getById: (id: string) => api.get(`/bookings/${id}`),
-  create: (data: any) => api.post('/bookings', data),
+  create: (data: Record<string, unknown>) => api.post('/bookings', data),
   updateStatus: (id: string, status: string) => api.patch(`/bookings/${id}/status`, { status }),
   assignDetailer: (id: string, detailer_id: string) => api.patch(`/bookings/${id}/assign`, { detailer_id }),
   cancel: (id: string) => api.delete(`/bookings/${id}`),
@@ -61,14 +61,14 @@ export const bookingsAPI = {
 // Vehicles APIs
 export const vehiclesAPI = {
   getAll: () => api.get('/vehicles'),
-  create: (data: any) => api.post('/vehicles', data),
-  update: (id: string, data: any) => api.put(`/vehicles/${id}`, data),
+  create: (data: Record<string, unknown>) => api.post('/vehicles', data),
+  update: (id: string, data: Record<string, unknown>) => api.put(`/vehicles/${id}`, data),
   delete: (id: string) => api.delete(`/vehicles/${id}`),
 };
 
 // Users APIs
 export const usersAPI = {
-  getAll: (params?: any) => api.get('/users', { params }),
+  getAll: (params?: Record<string, unknown>) => api.get('/users', { params }),
   getPending: () => api.get('/users/pending'),
   approve: (id: string) => api.patch(`/users/${id}/approve`),
   reject: (id: string) => api.delete(`/users/${id}/reject`),
@@ -103,7 +103,7 @@ export const notificationsAPI = {
 
 // Payments APIs
 export const paymentsAPI = {
-  getAll: (params?: any) => api.get('/payments', { params }),
+  getAll: (params?: Record<string, unknown>) => api.get('/payments', { params }),
   getById: (id: string) => api.get(`/payments/${id}`),
   initiateSTKPush: (data: { phone: string; amount: number; booking_id?: string }) => 
     api.post('/payments/mpesa/stkpush', data),
