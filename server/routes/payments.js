@@ -10,7 +10,7 @@ const CONSUMER_KEY = '9t9EdgWDctNpDwCAlWudZNG1GRtX5VVGu1S1EJ8cSiX9D9kU';
 const CONSUMER_SECRET = 'n8YrAg9UsNoUYXdxtJxWjWnmiHYK2aGJn12wfyqbgx3kzUstN4hAIS11K4KV49sw';
 const BUSINESS_SHORT_CODE = process.env.MPESA_SHORTCODE || '174379';
 const PASS_KEY = process.env.MPESA_PASSKEY || 'bfb279f9aa9bdbcf158e97dd71a467cd2e0c893059b10f78e6b72ada1ed2c919';
-const CALLBACK_URL = process.env.MPESA_CALLBACK_URL || 'https://your-domain.com/api/payments/callback';
+const CALLBACK_URL = process.env.MPESA_CALLBACK_URL || 'https://autoflowpro.vercel.app/api/payments/callback';
 
 // Get M-Pesa access token
 async function getMpesaAccessToken() {
