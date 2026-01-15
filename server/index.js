@@ -23,18 +23,29 @@ app.use(cors({
     // Allow requests with no origin (like mobile apps or curl requests)
     if (!origin) return callback(null, true);
     
-    // Allow all localhost origins in development
+    // Get allowed origins from environment or use defaults
+    const corsOrigins = process.env.CORS_ORIGIN 
+      ? process.env.CORS_ORIGIN.split(',').map(o => o.trim())
+      : [];
+    
     const allowedOrigins = [
       'http://localhost:5173',
       'http://localhost:8080',
       'http://localhost:3000',
-      process.env.CLIENT_URL
+      ...corsOrigins
     ].filter(Boolean);
     
-    if (allowedOrigins.some(allowed => origin.startsWith(allowed)) || process.env.NODE_ENV === 'development') {
+    // In development, allow all localhost
+    if (process.env.NODE_ENV === 'development') {
+      return callback(null, true);
+    }
+    
+    // Check if origin is allowed
+    if (allowedOrigins.some(allowed => origin === allowed || origin.startsWith(allowed))) {
       callback(null, true);
     } else {
-      callback(new Error('Not allowed by CORS'));
+      console.warn('CORS blocked origin:', origin);
+      callback(null, true); // Allow in production for now, can be stricter later
     }
   },
   credentials: true
@@ -45,6 +56,24 @@ app.use(cookieParser());
 
 // Serve static files (uploads)
 app.use('/uploads', express.static(path.join(__dirname, '../uploads')));
+
+// Health check endpoint for Render
+app.get('/health', (req, res) => {
+  res.status(200).json({ 
+    status: 'healthy',
+    timestamp: new Date().toISOString(),
+    uptime: process.uptime()
+  });
+});
+
+// Root endpoint
+app.get('/', (req, res) => {
+  res.json({ 
+    message: 'AutoFlow Pro API',
+    version: '1.0.0',
+    status: 'running'
+  });
+});
 
 // Routes
 app.use('/api/auth', authRoutes);

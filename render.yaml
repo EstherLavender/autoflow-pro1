@@ -1,0 +1,40 @@
+# Render Blueprint for AutoFlow Pro
+# This file configures both frontend and backend services
+
+services:
+  # Backend API Service
+  - type: web
+    name: autoflow-backend
+    env: node
+    region: oregon
+    plan: free
+    buildCommand: cd server && npm install
+    startCommand: cd server && node index.js
+    healthCheckPath: /health
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 3001
+      - key: DATABASE_URL
+        sync: false
+      - key: JWT_SECRET
+        generateValue: true
+      - key: MPESA_CONSUMER_KEY
+        sync: false
+      - key: MPESA_CONSUMER_SECRET
+        sync: false
+      - key: CORS_ORIGIN
+        sync: false
+
+  # Frontend Static Site
+  - type: web
+    name: autoflow-frontend
+    env: static
+    region: oregon
+    buildCommand: npm install && npm run build
+    staticPublishPath: ./dist
+    pullRequestPreviewsEnabled: true
+    envVars:
+      - key: VITE_API_URL
+        value: https://autoflow-backend.onrender.com/api
