@@ -63,21 +63,29 @@ export default function LoginPage() {
           return;
         }
 
-        const response = await signIn(formData.email, formData.password);
-        toast.success('Welcome back!');
+        await signIn(formData.email, formData.password);
         
-        // Get the user from localStorage after login
-        const userData = JSON.parse(localStorage.getItem('user') || '{}');
-        const userRole = userData.role;
-        
-        // Redirect based on user role
-        if (userRole === 'admin') {
-          navigate('/admin');
-        } else if (userRole === 'detailer') {
-          navigate('/operator');
-        } else if (userRole === 'customer') {
-          navigate('/customer');
-        } else {
+        // Wait a bit for state to update, then get user data
+        setTimeout(() => {
+          const userData = JSON.parse(localStorage.getItem('user') || '{}');
+          const userRole = userData.role;
+          
+          console.log('User data after login:', userData);
+          
+          toast.success('Welcome back!');
+          
+          // Redirect based on user role
+          if (userRole === 'admin') {
+            navigate('/admin');
+          } else if (userRole === 'detailer') {
+            navigate('/operator');
+          } else if (userRole === 'customer') {
+            navigate('/customer');
+          } else {
+            navigate('/');
+          }
+        }, 100);
+      }
           navigate('/');
         }
       }
