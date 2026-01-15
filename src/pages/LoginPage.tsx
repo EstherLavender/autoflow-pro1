@@ -63,28 +63,21 @@ export default function LoginPage() {
           return;
         }
 
-        await signIn(formData.email, formData.password);
+        const user = await signIn(formData.email, formData.password);
         
-        // Wait a bit for state to update, then get user data
-        setTimeout(() => {
-          const userData = JSON.parse(localStorage.getItem('user') || '{}');
-          const userRole = userData.role;
-          
-          console.log('User data after login:', userData);
-          
-          toast.success('Welcome back!');
-          
-          // Redirect based on user role
-          if (userRole === 'admin') {
-            navigate('/admin');
-          } else if (userRole === 'detailer') {
-            navigate('/operator');
-          } else if (userRole === 'customer') {
-            navigate('/customer');
-          } else {
-            navigate('/');
-          }
-        }, 100);
+        console.log('Logged in user:', user);
+        toast.success('Welcome back!');
+        
+        // Redirect based on user role
+        if (user.role === 'admin') {
+          navigate('/admin');
+        } else if (user.role === 'detailer') {
+          navigate('/operator');
+        } else if (user.role === 'customer') {
+          navigate('/customer');
+        } else {
+          navigate('/');
+        }
       }
           navigate('/');
         }
